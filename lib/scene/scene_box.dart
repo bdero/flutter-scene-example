@@ -4,9 +4,11 @@
 
 import 'dart:ui' as ui;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/material.dart';
+import 'package:vector_math/vector_math_64.dart';
 
 import 'camera.dart';
 
@@ -176,9 +178,7 @@ class SceneBox extends StatefulWidget {
   final bool alwaysRepaint;
 
   @override
-  State<StatefulWidget> createState() {
-    return _SceneBox();
-  }
+  State<StatefulWidget> createState() => _SceneBox();
 }
 
 class _SceneBox extends State<SceneBox> {
@@ -204,5 +204,56 @@ class _SceneBox extends State<SceneBox> {
         root: widget.root._resolvedNode,
         camera: widget.camera,
         alwaysRepaint: widget.alwaysRepaint);
+  }
+}
+
+class GestureSceneBox extends StatefulWidget {
+  const GestureSceneBox({super.key, required this.root});
+
+  final SceneNode root;
+
+  @override
+  State<GestureSceneBox> createState() => _GestureSceneBoxState();
+}
+
+class _GestureSceneBoxState extends State<GestureSceneBox> {
+  Vector3 _direction = Vector3(0, 0, -1);
+  double _distance = 5;
+
+  double _startScaleDistance = 1;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onScaleStart: (details) {
+        _startScaleDistance = _distance;
+      },
+      onScaleEnd: (details) {},
+      onScaleUpdate: (details) {
+        setState(() {
+          _distance = _startScaleDistance / details.scale;
+
+          // TODO(bdero): Compute this transform more efficiently.
+          Matrix4 viewToWorldTransform = Matrix4.inverted(
+              matrix4LookAt(Vector3.zero(), -_direction, Vector3(0, 1, 0)));
+
+          Vector3 screenSpacePanDirection = Vector3(
+                  details.focalPointDelta.dx, -details.focalPointDelta.dy, 0)
+              .normalized();
+          Vector3 screenSpacePanAxis =
+              screenSpacePanDirection.cross(Vector3(0, 0, 1)).normalized();
+          Vector3 panAxis = viewToWorldTransform * screenSpacePanAxis;
+          _direction = Quaternion.axisAngle(
+                  panAxis, details.focalPointDelta.distance / 100)
+              .rotate(_direction)
+              .normalized();
+        });
+      },
+      behavior: HitTestBehavior.translucent,
+      child: SceneBox(
+        root: widget.root,
+        camera: Camera(position: _direction * _distance),
+      ),
+    );
   }
 }

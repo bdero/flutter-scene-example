@@ -73,9 +73,8 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text('Scene Demo'),
       ),
       body: Container(
-        child: SceneBox(
+        child: GestureSceneBox(
           root: SceneNode.asset('models/flutter_logo_baked.glb'),
-          camera: Camera(fovRadiansY: m64.radians(45)),
         ),
       ),
     );

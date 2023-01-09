@@ -8,8 +8,8 @@ import 'package:vector_math/vector_math_64.dart';
 
 Matrix4 matrix4LookAt(Vector3 position, Vector3 target, Vector3 up) {
   Vector3 forward = (target - position).normalized();
-  Vector3 right = up.cross(forward);
-  up = forward.cross(right);
+  Vector3 right = up.cross(forward).normalized();
+  up = forward.cross(right).normalized();
 
   return Matrix4(
     right.x, up.x, forward.x, 0.0, //
