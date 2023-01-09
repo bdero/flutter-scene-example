@@ -115,8 +115,7 @@ class SceneBoxUI extends LeafRenderObjectWidget {
 /// An immutable Scene node for conveniently building during widget tree construction.
 class SceneNode {
   static SceneNode asset(String assetUri) {
-    Future<ui.SceneNode> node =
-        ui.SceneNode.fromAsset('models/flutter_logo_baked.glb');
+    Future<ui.SceneNode> node = ui.SceneNode.fromAsset(assetUri);
     //node.onError((Object error, StackTrace stackTrace) {
     //  FlutterError.reportError(
     //      FlutterErrorDetails(exception: error, stack: stackTrace));
@@ -183,23 +182,18 @@ class SceneBox extends StatefulWidget {
 
 class _SceneBox extends State<SceneBox> {
   @override
-  void initState() {
-    widget.root.onLoadingComplete((node) {
-      // Kick the state to trigger a rebuild of the widget tree as soon as the
-      // node is ready.
-      if (mounted) setState(() {});
-    });
-
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     if (widget.root._resolvedNode == null) {
+      widget.root.onLoadingComplete((node) {
+        // Kick the state to trigger a rebuild of the widget tree as soon as the
+        // node is ready.
+        if (mounted) setState(() {});
+      });
       return const SizedBox.expand();
     }
 
     widget.root.connectChildren();
+
     return SceneBoxUI(
         root: widget.root._resolvedNode,
         camera: widget.camera,
@@ -233,6 +227,11 @@ class _GestureSceneBoxState extends State<GestureSceneBox> {
         setState(() {
           _distance = _startScaleDistance / details.scale;
 
+          double panDistance = details.focalPointDelta.distance;
+          if (panDistance < 1e-3) {
+            return;
+          }
+
           // TODO(bdero): Compute this transform more efficiently.
           Matrix4 viewToWorldTransform = Matrix4.inverted(
               matrix4LookAt(Vector3.zero(), -_direction, Vector3(0, 1, 0)));
@@ -243,10 +242,13 @@ class _GestureSceneBoxState extends State<GestureSceneBox> {
           Vector3 screenSpacePanAxis =
               screenSpacePanDirection.cross(Vector3(0, 0, 1)).normalized();
           Vector3 panAxis = viewToWorldTransform * screenSpacePanAxis;
-          _direction = Quaternion.axisAngle(
-                  panAxis, details.focalPointDelta.distance / 100)
-              .rotate(_direction)
-              .normalized();
+          Vector3 newDirection =
+              Quaternion.axisAngle(panAxis, panDistance / 100)
+                  .rotate(_direction)
+                  .normalized();
+          if (newDirection.length > 1e-1) {
+            _direction = newDirection;
+          }
         });
       },
       behavior: HitTestBehavior.translucent,

@@ -72,10 +72,9 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text('Scene Demo'),
       ),
-      body: Container(
-        child: GestureSceneBox(
-          root: SceneNode.asset('models/flutter_logo_baked.glb'),
-        ),
+      extendBodyBehindAppBar: false,
+      body: GestureSceneBox(
+        root: SceneNode.asset('models/flutter_logo_baked.glb'),
       ),
     );
   }
