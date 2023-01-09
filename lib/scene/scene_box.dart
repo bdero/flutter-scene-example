@@ -87,8 +87,9 @@ class SceneRenderBox extends RenderBox {
 
 /// Draws a given ui.SceneNode using a given camera.
 /// This is the lowest level widget for drawing an 3D scene.
-class SceneBox extends LeafRenderObjectWidget {
-  const SceneBox({Key? key, this.root, this.camera, this.alwaysRepaint = false})
+class SceneBoxUI extends LeafRenderObjectWidget {
+  const SceneBoxUI(
+      {Key? key, this.root, this.camera, this.alwaysRepaint = false})
       : super(key: key);
   final ui.SceneNode? root;
   final Camera? camera;
@@ -106,5 +107,102 @@ class SceneBox extends LeafRenderObjectWidget {
     renderObject.camera = camera;
     renderObject.alwaysRepaint = alwaysRepaint;
     super.updateRenderObject(context, renderObject);
+  }
+}
+
+/// An immutable Scene node for conveniently building during widget tree construction.
+class SceneNode {
+  static SceneNode asset(String assetUri) {
+    Future<ui.SceneNode> node =
+        ui.SceneNode.fromAsset('models/flutter_logo_baked.glb');
+    //node.onError((Object error, StackTrace stackTrace) {
+    //  FlutterError.reportError(
+    //      FlutterErrorDetails(exception: error, stack: stackTrace));
+    //});
+    return SceneNode(node);
+  }
+
+  static SceneNode transform(Matrix4 transform, {List<SceneNode>? children}) {
+    Future<ui.SceneNode> node = Future<ui.SceneNode>.value(
+        ui.SceneNode.fromTransform(transform.storage));
+    return SceneNode(node, children: children);
+  }
+
+  SceneNode(node, {resolved, List<SceneNode>? children})
+      : _node = node,
+        _children = children ?? [] {
+    _node.then((ui.SceneNode result) => _resolvedNode = result);
+  }
+
+  final Future<ui.SceneNode> _node;
+  final List<SceneNode> _children;
+
+  ui.SceneNode? _resolvedNode;
+  bool _connected = false;
+
+  /// Walk the immutable tree and form the internal scene graph by parenting the
+  /// ui.SceneNodes to eachother.
+  void connectChildren() {
+    if (_resolvedNode == null || _connected) return;
+    _connected = true;
+
+    for (var child in _children) {
+      if (child._resolvedNode == null) {
+        continue;
+      }
+      _resolvedNode!.addChild(child._resolvedNode!);
+      child.connectChildren();
+    }
+  }
+
+  void onLoadingComplete(Function(ui.SceneNode node) callback) {
+    if (_resolvedNode != null) {
+      callback(_resolvedNode!);
+      return;
+    }
+
+    _node.whenComplete(() {
+      if (_resolvedNode != null) callback(_resolvedNode!);
+    });
+  }
+}
+
+class SceneBox extends StatefulWidget {
+  const SceneBox(
+      {super.key, required this.root, this.camera, this.alwaysRepaint = false});
+
+  final SceneNode root;
+  final Camera? camera;
+  final bool alwaysRepaint;
+
+  @override
+  State<StatefulWidget> createState() {
+    return _SceneBox();
+  }
+}
+
+class _SceneBox extends State<SceneBox> {
+  @override
+  void initState() {
+    widget.root.onLoadingComplete((node) {
+      // Kick the state to trigger a rebuild of the widget tree as soon as the
+      // node is ready.
+      if (mounted) setState(() {});
+    });
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.root._resolvedNode == null) {
+      return const SizedBox.expand();
+    }
+
+    widget.root.connectChildren();
+    return SceneBoxUI(
+        root: widget.root._resolvedNode,
+        camera: widget.camera,
+        alwaysRepaint: widget.alwaysRepaint);
   }
 }
