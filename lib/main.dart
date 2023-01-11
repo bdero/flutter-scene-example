@@ -2,14 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:math';
-import 'dart:ui' as ui;
-import 'package:flutter/scheduler.dart';
-import 'package:vector_math/vector_math_64.dart' as m64;
 import 'package:flutter/material.dart';
-
-import 'scene/camera.dart';
-import 'scene/scene_box.dart';
+import 'package:scene_demo/demo/demo.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,43 +18,103 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Scene Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(),
+          primarySwatch: Colors.blue,
+          scaffoldBackgroundColor: const Color(0xFF3a3a3a)),
+      home: const DemoPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+class DemoPage extends StatefulWidget {
+  const DemoPage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<DemoPage> createState() => _DemoPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
+class _DemoPageState extends State<DemoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Scene Demo'),
+        title: const Text('Scene Demo'),
       ),
       extendBodyBehindAppBar: false,
-      body: GestureSceneBox(
-        root: //Node(children: [
-            //for (double x = -5; x <= 10; x++)
-            //  for (double y = -5; y <= 10; y++)
-            //    for (double z = -5; z <= 10; z++)
-            //      Node(position: m64.Vector3(x * 2, y * 2, z * 2), children: [
-            Node.asset('models/dash.glb'),
-        //      ]),
-        //]),
-      ),
+      body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ConstrainedBox(
+              constraints:
+                  BoxConstraints(maxHeight: MediaQuery.of(context).size.height),
+              child: DashWidget(),
+            ),
+          ]),
     );
   }
 }
+
+//class _MyHomePageState extends State<MyHomePage> {
+//  @override
+//  void initState() {
+//    super.initState();
+//  }
+//
+//  @override
+//  Widget build(BuildContext context) {
+//    return Scaffold(
+//      appBar: AppBar(
+//        title: const Text('Scene Demo'),
+//      ),
+//      extendBodyBehindAppBar: false,
+//      body: GestureSceneBox(
+//        root: Node(position: vm.Vector3(0, -1.5, 0), children: [
+//          for (double x = -4; x <= 3; x++)
+//            for (double y = -4; y <= 3; y++)
+//              for (double z = -4; z <= 3; z++)
+//                Node(position: vm.Vector3(x * 4, y * 4, z * 4), children: [
+//                  Node.asset('models/dash.glb', animations: ['Walk']),
+//                ]),
+//        ]),
+//      ),
+//    );
+//  }
+//}
+
+//class _MyHomePageState extends State<MyHomePage> {
+//  _MyHomePageState() {
+//    dash = Node.asset('models/dash.glb');
+//  }
+//
+//  late Node dash;
+//
+//  @override
+//  void initState() {
+//    super.initState();
+//  }
+//
+//  @override
+//  Widget build(BuildContext context) {
+//    return Scaffold(
+//      appBar: AppBar(
+//        title: const Text('Scene Demo'),
+//      ),
+//      extendBodyBehindAppBar: false,
+//      body: GestureSceneBox(
+//        root: Node(
+//          position: vm.Vector3(0, -1.5, 0),
+//          children: [
+//            for (double x = -4; x <= 4; x++)
+//              for (double y = -4; y <= 4; y++)
+//                for (double z = -4; z <= 4; z++)
+//                  Node(
+//                    position: vm.Vector3(x * 3.5, y * 3.5, z * 3.5),
+//                    children: [dash],
+//                  ),
+//          ],
+//        ),
+//      ),
+//    );
+//  }
+//}
+

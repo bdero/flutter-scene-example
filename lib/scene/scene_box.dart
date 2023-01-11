@@ -43,7 +43,9 @@ class SceneRenderBox extends RenderBox {
 
   set alwaysRepaint(bool alwaysRepaint) {
     if (alwaysRepaint) {
-      _ticker = Ticker((_) => markNeedsPaint());
+      _ticker = Ticker((_) {
+        if (debugDisposed != null && !(debugDisposed!)) markNeedsPaint();
+      });
       markNeedsPaint();
     } else {
       _ticker = null;
@@ -85,6 +87,12 @@ class SceneRenderBox extends RenderBox {
     context.canvas.drawRect(Rect.fromLTWH(0, 0, _size.width, _size.height),
         Paint()..shader = _shader);
   }
+
+  @override
+  void dispose() {
+    _ticker?.stop();
+    super.dispose();
+  }
 }
 
 /// Draws a given ui.SceneNode using a given camera.
@@ -114,9 +122,17 @@ class SceneBoxUI extends LeafRenderObjectWidget {
 
 /// An immutable Scene node for conveniently building during widget tree construction.
 class Node {
-  static Node asset(String assetUri) {
+  static Node asset(String assetUri, {List<String>? animations}) {
     Future<ui.SceneNode> node = ui.SceneNode.fromAsset(assetUri);
-    return Node._(node);
+
+    Node result = Node._(node);
+
+    if (animations != null) {
+      for (var animation in animations) {
+        result.playAnimation(animation);
+      }
+    }
+    return result;
   }
 
   static Node transform({Matrix4? transform, List<Node>? children}) {
@@ -175,11 +191,25 @@ class Node {
       if (_resolvedNode != null) callback(_resolvedNode!);
     });
   }
+
+  void playAnimation(String name) {
+    setAnimationState(name, true, true, 1.0, 1.0);
+  }
+
+  void setAnimationState(
+      String name, bool playing, bool loop, double weight, double timescale) {
+    onLoadingComplete((node) =>
+        {node.setAnimationState(name, playing, loop, weight, timescale)});
+  }
+}
+
+Node AssetNode(String assetUri) {
+  return Node.asset(assetUri);
 }
 
 class SceneBox extends StatefulWidget {
   const SceneBox(
-      {super.key, required this.root, this.camera, this.alwaysRepaint = false});
+      {super.key, required this.root, this.camera, this.alwaysRepaint = true});
 
   final Node root;
   final Camera? camera;
@@ -210,18 +240,18 @@ class _SceneBox extends State<SceneBox> {
   }
 }
 
-class GestureSceneBox extends StatefulWidget {
-  const GestureSceneBox({super.key, required this.root});
+class Scene extends StatefulWidget {
+  const Scene({super.key, required this.node});
 
-  final Node root;
+  final Node node;
 
   @override
-  State<GestureSceneBox> createState() => _GestureSceneBoxState();
+  State<Scene> createState() => _SceneState();
 }
 
-class _GestureSceneBoxState extends State<GestureSceneBox> {
+class _SceneState extends State<Scene> {
   Vector3 _direction = Vector3(0, 0, -1);
-  double _distance = 5;
+  double _distance = 7.5;
 
   double _startScaleDistance = 1;
 
@@ -262,8 +292,10 @@ class _GestureSceneBoxState extends State<GestureSceneBox> {
       },
       behavior: HitTestBehavior.translucent,
       child: SceneBox(
-        root: widget.root,
-        camera: Camera(position: _direction * _distance),
+        root: widget.node,
+        camera: Camera(
+            position: Vector3(0, 1.65, 0) + _direction * _distance,
+            target: Vector3(0, 1.75, 0)),
       ),
     );
   }
