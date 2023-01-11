@@ -39,31 +39,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  //ui.SceneNode? ipscene;
-  //Camera camera = Camera();
-  //Ticker? ticker;
-
   @override
   void initState() {
     super.initState();
-    //ui.SceneNode.fromAsset('models/flutter_logo_baked.glb')
-    //    .then((ui.SceneNode scene) {
-    //  if (!mounted) {
-    //    return;
-    //  }
-    //  setState(() {
-    //    ipscene = scene;
-    //  });
-    //
-    //  // Start a ticker to update the camera every frame.
-    //  ticker = Ticker((time) {
-    //    setState(() {
-    //      double t = time.inMilliseconds / Duration.millisecondsPerSecond;
-    //      camera.position = m64.Vector3(10 * sin(t), 10 * cos(t), -5);
-    //    });
-    //  });
-    //  ticker!.start();
-    //});
   }
 
   @override
@@ -74,7 +52,14 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       extendBodyBehindAppBar: false,
       body: GestureSceneBox(
-        root: SceneNode.asset('models/flutter_logo_baked.glb'),
+        root: //Node(children: [
+            //for (double x = -5; x <= 10; x++)
+            //  for (double y = -5; y <= 10; y++)
+            //    for (double z = -5; z <= 10; z++)
+            //      Node(position: m64.Vector3(x * 2, y * 2, z * 2), children: [
+            Node.asset('models/dash.glb'),
+        //      ]),
+        //]),
       ),
     );
   }

@@ -113,30 +113,35 @@ class SceneBoxUI extends LeafRenderObjectWidget {
 }
 
 /// An immutable Scene node for conveniently building during widget tree construction.
-class SceneNode {
-  static SceneNode asset(String assetUri) {
+class Node {
+  static Node asset(String assetUri) {
     Future<ui.SceneNode> node = ui.SceneNode.fromAsset(assetUri);
-    //node.onError((Object error, StackTrace stackTrace) {
-    //  FlutterError.reportError(
-    //      FlutterErrorDetails(exception: error, stack: stackTrace));
-    //});
-    return SceneNode(node);
+    return Node._(node);
   }
 
-  static SceneNode transform(Matrix4 transform, {List<SceneNode>? children}) {
-    Future<ui.SceneNode> node = Future<ui.SceneNode>.value(
-        ui.SceneNode.fromTransform(transform.storage));
-    return SceneNode(node, children: children);
+  static Node transform({Matrix4? transform, List<Node>? children}) {
+    Matrix4 t = transform ?? Matrix4.identity();
+    Future<ui.SceneNode> node =
+        Future<ui.SceneNode>.value(ui.SceneNode.fromTransform(t.storage));
+    return Node._(node, children: children);
   }
 
-  SceneNode(node, {resolved, List<SceneNode>? children})
+  factory Node({Vector3? position, List<Node>? children}) {
+    Matrix4 transform = Matrix4.identity();
+    if (position != null) {
+      transform *= Matrix4.translation(position);
+    }
+    return Node.transform(transform: transform, children: children);
+  }
+
+  Node._(node, {List<Node>? children})
       : _node = node,
         _children = children ?? [] {
     _node.then((ui.SceneNode result) => _resolvedNode = result);
   }
 
-  final Future<ui.SceneNode> _node;
-  final List<SceneNode> _children;
+  late final Future<ui.SceneNode> _node;
+  final List<Node> _children;
 
   ui.SceneNode? _resolvedNode;
   bool _connected = false;
@@ -149,6 +154,10 @@ class SceneNode {
 
     for (var child in _children) {
       if (child._resolvedNode == null) {
+        child._node.then((value) {
+          _resolvedNode!.addChild(child._resolvedNode!);
+          child.connectChildren();
+        });
         continue;
       }
       _resolvedNode!.addChild(child._resolvedNode!);
@@ -172,7 +181,7 @@ class SceneBox extends StatefulWidget {
   const SceneBox(
       {super.key, required this.root, this.camera, this.alwaysRepaint = false});
 
-  final SceneNode root;
+  final Node root;
   final Camera? camera;
   final bool alwaysRepaint;
 
@@ -204,7 +213,7 @@ class _SceneBox extends State<SceneBox> {
 class GestureSceneBox extends StatefulWidget {
   const GestureSceneBox({super.key, required this.root});
 
-  final SceneNode root;
+  final Node root;
 
   @override
   State<GestureSceneBox> createState() => _GestureSceneBoxState();
