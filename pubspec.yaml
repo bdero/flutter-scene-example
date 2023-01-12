@@ -59,8 +59,12 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  assets:
+    - assets/dash.png
+
   models:
-    - models/flutter_logo_baked.glb
+    - models/flutter_logo.glb
+    - models/dash.glb
 
   # To add assets to your application, add an assets section, like this:
   # assets:
