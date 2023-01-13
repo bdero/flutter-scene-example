@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Scene Demo',
       theme: ThemeData(
+          useMaterial3: true,
           primarySwatch: Colors.blue,
           scaffoldBackgroundColor: const Color(0xFF3a3a3a)),
       home: const DemoPage(),
