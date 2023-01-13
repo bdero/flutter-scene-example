@@ -7,6 +7,11 @@ class DashWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Image(image: AssetImage("assets/dash.png"));
+    return Scene(
+        node: manyNodes(Node.asset("models/dash.glb", animations: ["Walk"])));
   }
 }
+
+// First start with Placeholder()
+// Then move to const Image(image: AssetImage("assets/dash.png"));
+// Then move to Scene(node: Node.asset("models/dash.glb"));
