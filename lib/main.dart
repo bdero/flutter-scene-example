@@ -37,21 +37,18 @@ class _DemoPageState extends State<DemoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Scene Demo'),
-      ),
-      extendBodyBehindAppBar: false,
-      body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            ConstrainedBox(
-              constraints:
-                  BoxConstraints(maxHeight: MediaQuery.of(context).size.height),
-              child: DashWidget(),
-            ),
-          ]),
-    );
+        appBar: AppBar(
+          title: const Text('Scene Demo'),
+        ),
+        extendBodyBehindAppBar: false,
+        body: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: DashWidget(),
+              )
+            ]));
   }
 }
 

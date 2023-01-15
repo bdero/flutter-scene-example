@@ -84,7 +84,8 @@ class SceneRenderBox extends RenderBox {
     _shader!
         .setCameraTransform(camera.computeTransform(size.aspectRatio).storage);
 
-    context.canvas.drawRect(Rect.fromLTWH(0, 0, _size.width, _size.height),
+    context.canvas.drawRect(
+        Rect.fromLTWH(offset.dx, offset.dy, _size.width, _size.height),
         Paint()..shader = _shader);
   }
 
