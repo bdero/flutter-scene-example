@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:scene_demo/demo/demo.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const DemoApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class DemoApp extends StatelessWidget {
+  const DemoApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -26,14 +26,9 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class DemoPage extends StatefulWidget {
+class DemoPage extends StatelessWidget {
   const DemoPage({super.key});
 
-  @override
-  State<DemoPage> createState() => _DemoPageState();
-}
-
-class _DemoPageState extends State<DemoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,75 +39,10 @@ class _DemoPageState extends State<DemoPage> {
         body: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
+            children: const [
               Expanded(
                 child: DashWidget(),
               )
             ]));
   }
 }
-
-//class _MyHomePageState extends State<MyHomePage> {
-//  @override
-//  void initState() {
-//    super.initState();
-//  }
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    return Scaffold(
-//      appBar: AppBar(
-//        title: const Text('Scene Demo'),
-//      ),
-//      extendBodyBehindAppBar: false,
-//      body: GestureSceneBox(
-//        root: Node(position: vm.Vector3(0, -1.5, 0), children: [
-//          for (double x = -4; x <= 3; x++)
-//            for (double y = -4; y <= 3; y++)
-//              for (double z = -4; z <= 3; z++)
-//                Node(position: vm.Vector3(x * 4, y * 4, z * 4), children: [
-//                  Node.asset('models/dash.glb', animations: ['Walk']),
-//                ]),
-//        ]),
-//      ),
-//    );
-//  }
-//}
-
-//class _MyHomePageState extends State<MyHomePage> {
-//  _MyHomePageState() {
-//    dash = Node.asset('models/dash.glb');
-//  }
-//
-//  late Node dash;
-//
-//  @override
-//  void initState() {
-//    super.initState();
-//  }
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    return Scaffold(
-//      appBar: AppBar(
-//        title: const Text('Scene Demo'),
-//      ),
-//      extendBodyBehindAppBar: false,
-//      body: GestureSceneBox(
-//        root: Node(
-//          position: vm.Vector3(0, -1.5, 0),
-//          children: [
-//            for (double x = -4; x <= 4; x++)
-//              for (double y = -4; y <= 4; y++)
-//                for (double z = -4; z <= 4; z++)
-//                  Node(
-//                    position: vm.Vector3(x * 3.5, y * 3.5, z * 3.5),
-//                    children: [dash],
-//                  ),
-//          ],
-//        ),
-//      ),
-//    );
-//  }
-//}
-
