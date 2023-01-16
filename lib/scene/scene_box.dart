@@ -124,7 +124,7 @@ class SceneBoxUI extends LeafRenderObjectWidget {
 /// An immutable Scene node for conveniently building during widget tree construction.
 class Node {
   static Node asset(String assetUri, {List<String>? animations}) {
-    Future<ui.SceneNode> node = ui.SceneNode.fromAsset(assetUri);
+    ui.SceneNodeValue node = ui.SceneNode.fromAsset(assetUri);
 
     Node result = Node._(node);
 
@@ -138,8 +138,7 @@ class Node {
 
   static Node transform({Matrix4? transform, List<Node>? children}) {
     Matrix4 t = transform ?? Matrix4.identity();
-    Future<ui.SceneNode> node =
-        Future<ui.SceneNode>.value(ui.SceneNode.fromTransform(t.storage));
+    ui.SceneNodeValue node = ui.SceneNode.fromTransform(t.storage);
     return Node._(node, children: children);
   }
 
@@ -153,43 +152,30 @@ class Node {
 
   Node._(node, {List<Node>? children})
       : _node = node,
-        _children = children ?? [] {
-    _node.then((ui.SceneNode result) => _resolvedNode = result);
-  }
+        _children = children ?? [];
 
-  late final Future<ui.SceneNode> _node;
+  late final ui.SceneNodeValue _node;
   final List<Node> _children;
 
-  ui.SceneNode? _resolvedNode;
   bool _connected = false;
 
   /// Walk the immutable tree and form the internal scene graph by parenting the
-  /// ui.SceneNodes to eachother.
+  /// ui.SceneNodes to each other.
   void connectChildren() {
-    if (_resolvedNode == null || _connected) return;
+    if (!_node.isComplete || _connected) return;
     _connected = true;
 
     for (var child in _children) {
-      if (child._resolvedNode == null) {
-        child._node.then((value) {
-          _resolvedNode!.addChild(child._resolvedNode!);
-          child.connectChildren();
-        });
-        continue;
-      }
-      _resolvedNode!.addChild(child._resolvedNode!);
-      child.connectChildren();
+      child._node.whenComplete((ui.SceneNode childNode) {
+        _node.value!.addChild(childNode);
+        child.connectChildren();
+      });
     }
   }
 
   void onLoadingComplete(Function(ui.SceneNode node) callback) {
-    if (_resolvedNode != null) {
-      callback(_resolvedNode!);
-      return;
-    }
-
-    _node.whenComplete(() {
-      if (_resolvedNode != null) callback(_resolvedNode!);
+    _node.whenComplete((ui.SceneNode result) {
+      callback(result);
     });
   }
 
@@ -223,7 +209,7 @@ class SceneBox extends StatefulWidget {
 class _SceneBox extends State<SceneBox> {
   @override
   Widget build(BuildContext context) {
-    if (widget.root._resolvedNode == null) {
+    if (!widget.root._node.isComplete) {
       widget.root.onLoadingComplete((node) {
         // Kick the state to trigger a rebuild of the widget tree as soon as the
         // node is ready.
@@ -235,7 +221,7 @@ class _SceneBox extends State<SceneBox> {
     widget.root.connectChildren();
 
     return SceneBoxUI(
-        root: widget.root._resolvedNode,
+        root: widget.root._node.value,
         camera: widget.camera,
         alwaysRepaint: widget.alwaysRepaint);
   }
