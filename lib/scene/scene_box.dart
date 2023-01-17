@@ -244,6 +244,8 @@ class _SceneState extends State<Scene> {
 
   @override
   Widget build(BuildContext context) {
+    Vector3 cameraPosition = Vector3(0, 1.65, 0) + _direction * _distance;
+
     return GestureDetector(
       onScaleStart: (details) {
         _startScaleDistance = _distance;
@@ -279,10 +281,13 @@ class _SceneState extends State<Scene> {
       },
       behavior: HitTestBehavior.translucent,
       child: SceneBox(
-        root: widget.node,
-        camera: Camera(
-            position: Vector3(0, 1.65, 0) + _direction * _distance,
-            target: Vector3(0, 1.75, 0)),
+        root: Node(children: [
+          widget.node,
+          Node(
+              position: cameraPosition,
+              children: [Node.asset("models/sky_sphere.glb")])
+        ]),
+        camera: Camera(position: cameraPosition, target: Vector3(0, 1.75, 0)),
       ),
     );
   }

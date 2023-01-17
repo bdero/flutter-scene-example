@@ -2,8 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:scene_demo/demo/demo.dart';
+import 'package:scene_demo/scene/game.dart';
 
 void main() {
   runApp(const DemoApp());
@@ -26,23 +29,65 @@ class DemoApp extends StatelessWidget {
   }
 }
 
-class DemoPage extends StatelessWidget {
+class DemoPage extends StatefulWidget {
   const DemoPage({super.key});
 
   @override
+  State<DemoPage> createState() => _DemoPageState();
+}
+
+class _DemoPageState extends State<DemoPage> {
+  int widgetIndex = 0;
+
+  @override
   Widget build(BuildContext context) {
+    final widgets = [const DashWidget(), const GameWidget()];
+
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Scene Demo'),
+      appBar: AppBar(
+        title: Row(
+          children: [
+            AnimatedOpacity(
+              opacity: widgetIndex > 0 ? 1 : 0,
+              duration: const Duration(milliseconds: 300),
+              child: IconButton(
+                onPressed: () => setState(() {
+                  widgetIndex = max(0, widgetIndex - 1);
+                }),
+                icon: const Icon(Icons.arrow_back_ios),
+              ),
+            ),
+            const Expanded(
+                child: Text(
+              'Scene Demo',
+              textAlign: TextAlign.center,
+            )),
+            AnimatedOpacity(
+              opacity: widgetIndex < widgets.length - 1 ? 1 : 0,
+              duration: const Duration(milliseconds: 300),
+              child: IconButton(
+                onPressed: () => setState(() {
+                  widgetIndex = min(widgets.length - 1, widgetIndex + 1);
+                }),
+                icon: const Icon(Icons.arrow_forward_ios),
+              ),
+            ),
+          ],
         ),
-        extendBodyBehindAppBar: false,
-        body: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: const [
-              Expanded(
-                child: DashWidget(),
-              )
-            ]));
+      ),
+      extendBodyBehindAppBar: false,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(child: widgets[widgetIndex]
+              //child: IndexedStack(
+              //  index: widgetIndex,
+              //  children: widgets,
+              //),
+              ),
+        ],
+      ),
+    );
   }
 }

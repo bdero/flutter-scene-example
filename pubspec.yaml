@@ -63,8 +63,9 @@ flutter:
     - assets/dash.png
 
   models:
-    - models/flutter_logo.glb
+    - models/sky_sphere.glb
     - models/dash.glb
+    - models/ground.glb
 
   # To add assets to your application, add an assets section, like this:
   # assets:
