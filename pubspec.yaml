@@ -66,6 +66,7 @@ flutter:
     - models/sky_sphere.glb
     - models/dash.glb
     - models/ground.glb
+    - models/coin.glb
 
   # To add assets to your application, add an assets section, like this:
   # assets:

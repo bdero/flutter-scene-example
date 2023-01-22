@@ -114,6 +114,64 @@ class FollowCamera {
   }
 }
 
+class Coin {
+  Vector3 position;
+  double rotation = 0;
+  bool collected = false;
+  double collectAnimation = 0;
+
+  Coin(this.position);
+
+  Node get node {
+    return Node.transform(
+      transform: Matrix4.translation(position) * Matrix4.rotationY(rotation),
+      children: [
+        Node.asset("models/coin.glb"),
+      ],
+    );
+  }
+
+  Node update(Vector3 playerPosition, double deltaSeconds) {
+    if (!collected) {
+      double distance = (playerPosition - position).length;
+      if (distance < 2.2) {
+        collected = true;
+      }
+    }
+    if (collected) {
+      collectAnimation = math.min(1, collectAnimation + deltaSeconds * 2);
+      position += Vector3(0, collectAnimation * 2, 0);
+    }
+
+    rotation += deltaSeconds * 2;
+
+    return node;
+  }
+}
+
+class CoinCollection {
+  final List<Coin> coins = [
+    Coin(Vector3(-1.4 - 0.8 * 0, 1.5, -6 - 2 * 0)),
+    Coin(Vector3(-1.4 - 0.8 * 1, 1.5, -6 - 2 * 1)),
+    Coin(Vector3(-1.4 - 0.8 * 2, 1.5, -6 - 2 * 2)),
+    Coin(Vector3(-1.4 - 0.8 * 3, 1.5, -6 - 2 * 3)),
+    //
+    Coin(Vector3(-15 + 2 * 0, 1.5, 0 - 1.2 * 0)),
+    Coin(Vector3(-15 + 2 * 1, 1.5, 0 - 1.2 * 1)),
+    Coin(Vector3(-15 + 2 * 2, 1.5, 0 - 1.2 * 2)),
+    Coin(Vector3(-15 + 2 * 3, 1.5, 0 - 1.2 * 3)),
+  ];
+
+  Node update(Vector3 playerPosition, double deltaSeconds) {
+    return Node(
+      // TODO(bdero): Can this be made more efficient?
+      children: coins
+          .map((coin) => coin.update(playerPosition, deltaSeconds))
+          .toList(growable: false),
+    );
+  }
+}
+
 class _GameWidgetState extends State<GameWidget> {
   Ticker? tick;
   double time = 0;
@@ -121,6 +179,7 @@ class _GameWidgetState extends State<GameWidget> {
 
   final KinematicPlayer player = KinematicPlayer();
   final FollowCamera camera = FollowCamera();
+  final CoinCollection coins = CoinCollection();
 
   @override
   void initState() {
@@ -168,6 +227,7 @@ class _GameWidgetState extends State<GameWidget> {
                 Matrix4.translation(camera.position) * Matrix4.rotationY(time),
             children: [Node.asset("models/sky_sphere.glb")],
           ),
+          coins.update(player.position, deltaSeconds),
         ]),
         camera: camera.update(player.position, deltaSeconds),
       ),
