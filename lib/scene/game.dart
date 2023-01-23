@@ -51,8 +51,10 @@ class KinematicPlayer {
     double speed = _velocityXZ.length;
 
     Node characterModel = Node.asset("models/dash.glb");
-    characterModel.setAnimationState("Walk", true, true, 0.0, 1.0);
-    characterModel.setAnimationState("Run", true, true, speed, 1.0);
+    characterModel.setAnimationState("Walk", false, true, 0.0, 1.0);
+    characterModel.setAnimationState("Idle", true, true, 1 - speed, 1.2);
+    characterModel.setAnimationState("Run", true, true, speed, 0.9);
+    //characterModel.setAnimationState("Blink", true, true, 1.0, 1.0);
 
     return Node.transform(
       transform: transform,
@@ -118,29 +120,39 @@ class Coin {
   Vector3 position;
   double rotation = 0;
   bool collected = false;
+
+  Vector3 startAnimPosition = Vector3.zero();
   double collectAnimation = 0;
 
   Coin(this.position);
 
   Node get node {
     return Node.transform(
-      transform: Matrix4.translation(position) * Matrix4.rotationY(rotation),
+      transform: Matrix4.translation(position) *
+          Matrix4.rotationY(rotation) *
+          math.min(1.0, 3 - 3 * collectAnimation),
       children: [
         Node.asset("models/coin.glb"),
       ],
     );
   }
 
-  Node update(Vector3 playerPosition, double deltaSeconds) {
+  Node? update(Vector3 playerPosition, double deltaSeconds) {
+    if (collected && collectAnimation == 1) {
+      return null;
+    }
+
     if (!collected) {
       double distance = (playerPosition - position).length;
       if (distance < 2.2) {
         collected = true;
+        startAnimPosition = position;
       }
     }
     if (collected) {
       collectAnimation = math.min(1, collectAnimation + deltaSeconds * 2);
-      position += Vector3(0, collectAnimation * 2, 0);
+      position.y = startAnimPosition.y + math.sin(collectAnimation * 5) * 0.4;
+      rotation += deltaSeconds * 10;
     }
 
     rotation += deltaSeconds * 2;
@@ -156,10 +168,15 @@ class CoinCollection {
     Coin(Vector3(-1.4 - 0.8 * 2, 1.5, -6 - 2 * 2)),
     Coin(Vector3(-1.4 - 0.8 * 3, 1.5, -6 - 2 * 3)),
     //
-    Coin(Vector3(-15 + 2 * 0, 1.5, 0 - 1.2 * 0)),
-    Coin(Vector3(-15 + 2 * 1, 1.5, 0 - 1.2 * 1)),
-    Coin(Vector3(-15 + 2 * 2, 1.5, 0 - 1.2 * 2)),
-    Coin(Vector3(-15 + 2 * 3, 1.5, 0 - 1.2 * 3)),
+    Coin(Vector3(-15 + 2 * 0, 1.5, 0.5 - 1.2 * 0)),
+    Coin(Vector3(-15 + 2 * 1, 1.5, 0.5 - 1.2 * 1)),
+    Coin(Vector3(-15 + 2 * 2, 1.5, 0.5 - 1.2 * 2)),
+    Coin(Vector3(-15 + 2 * 3, 1.5, 0.5 - 1.2 * 3)),
+    //
+    Coin(Vector3(7 + 2 * 0, 1.5, -16 + 1.3 * 0)),
+    Coin(Vector3(7 + 2 * 1, 1.5, -16.5 + 1.3 * 1)),
+    Coin(Vector3(7 + 2 * 2, 1.5, -16.5 + 1.3 * 2)),
+    Coin(Vector3(7 + 2 * 3, 1.5, -16 + 1.3 * 3)),
   ];
 
   Node update(Vector3 playerPosition, double deltaSeconds) {
@@ -167,6 +184,7 @@ class CoinCollection {
       // TODO(bdero): Can this be made more efficient?
       children: coins
           .map((coin) => coin.update(playerPosition, deltaSeconds))
+          .whereType<Node>()
           .toList(growable: false),
     );
   }
@@ -224,7 +242,7 @@ class _GameWidgetState extends State<GameWidget> {
           player.update(deltaSeconds),
           Node.transform(
             transform:
-                Matrix4.translation(camera.position) * Matrix4.rotationY(time),
+                Matrix4.translation(camera.position) * Matrix4.rotationY(3),
             children: [Node.asset("models/sky_sphere.glb")],
           ),
           coins.update(player.position, deltaSeconds),
