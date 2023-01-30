@@ -1,16 +1,9 @@
-# scene_demo
+# Impeller Scene 3D Demo
 
-A new Flutter project.
+## ⚠️ Experimental! ⚠️
 
-## Getting Started
+* This demo requires Impeller, which currently only supports iOS/iOS simulators.
+* The [flutter_scene](https://pub.dev/packages/flutter_scene) package does not work out of the box and currently requires a special custom build of Flutter Engine to use (gn arg `--enable-impeller-3d`).
+* The underlying Flutter API used to build and render Scene nodes is _not_ supported and _will_ break repeatedly. Eventually, the API will be removed/replaced altogether.
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![Demo video](impeller_scene.mov)

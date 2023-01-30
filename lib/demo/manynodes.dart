@@ -1,4 +1,4 @@
-import 'package:scene_demo/scene/scene_box.dart';
+import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 Node manyNodes(Node input) {

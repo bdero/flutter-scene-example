@@ -6,7 +6,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:scene_demo/demo/demo.dart';
-import 'package:scene_demo/scene/game.dart';
+import 'package:scene_demo/demo/game.dart';
 
 void main() {
   runApp(const DemoApp());

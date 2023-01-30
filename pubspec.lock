@@ -70,6 +70,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.1"
+  flutter_scene:
+    dependency: "direct main"
+    description:
+      name: flutter_scene
+      sha256: "64a6167ed15118d63a72b740b4ec90c3e34f02f882e8e54e397555e164a97077"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1-dev.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -172,10 +180,10 @@ packages:
     dependency: transitive
     description:
       name: test_api
-      sha256: c9282698e2982b6c3817037554e52f99d4daba493e8028f8112a83d68ccd0b12
+      sha256: "6182294da5abf431177fccc1ee02401f6df30f766bc6130a0852c6b6d7ee6b2d"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.17"
+    version: "0.4.18"
   vector_math:
     dependency: "direct main"
     description:
@@ -185,4 +193,5 @@ packages:
     source: hosted
     version: "2.1.4"
 sdks:
-  dart: ">=3.0.0-85.0.dev <4.0.0"
+  dart: ">=3.0.0-122.0.dev <4.0.0"
+  flutter: ">=1.17.0"

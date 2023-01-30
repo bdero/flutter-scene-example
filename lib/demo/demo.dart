@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:scene_demo/demo/manynodes.dart';
-import 'package:scene_demo/scene/scene_box.dart';
+import 'package:flutter_scene/scene.dart';
 
 class DashWidget extends StatelessWidget {
   const DashWidget({super.key});
