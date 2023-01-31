@@ -1,5 +1,8 @@
 # Impeller Scene 3D Demo
 
+This demo was featured as part of Flutter Forward 2023! Watch the keynote here:
+[![Flutter Forward Thumbnail](https://img.youtube.com/vi/zKQYGKAe5W8/0.jpg)](https://www.youtube.com/watch?v=zKQYGKAe5W8&t=7074s "Flutter Forward 2023")
+
 ## ⚠️ Experimental! ⚠️
 
 * This demo requires Impeller, which currently only supports iOS/iOS simulators.
