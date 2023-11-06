@@ -1,17 +1,12 @@
 import 'dart:math' as math;
+import 'dart:math';
 
+import 'package:arkit_plugin/arkit_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_scene/scene.dart';
 import 'package:flutter_scene/camera.dart';
 import 'package:vector_math/vector_math_64.dart';
-
-class GameWidget extends StatefulWidget {
-  const GameWidget({super.key});
-
-  @override
-  State<GameWidget> createState() => _GameWidgetState();
-}
 
 class KinematicPlayer {
   /// 1/n seconds from zero veclocity to full velocity.
@@ -225,6 +220,13 @@ class CoinCollection {
   }
 }
 
+class GameWidget extends StatefulWidget {
+  const GameWidget({super.key});
+
+  @override
+  State<GameWidget> createState() => _GameWidgetState();
+}
+
 class _GameWidgetState extends State<GameWidget> {
   Ticker? tick;
   double time = 0;
@@ -287,6 +289,119 @@ class _GameWidgetState extends State<GameWidget> {
             Vector3(player._velocityXZ.x, 0, player._velocityXZ.y) *
                 player.kMaxSpeed,
             deltaSeconds),
+      ),
+    );
+  }
+}
+
+class GameWidgetAR extends StatefulWidget {
+  const GameWidgetAR(
+      this.projectionMatrix, this.viewMatrix, this.anchorTransform,
+      {super.key});
+  final Matrix4 projectionMatrix;
+  final Matrix4 viewMatrix;
+  final Matrix4 anchorTransform;
+
+  @override
+  State<GameWidgetAR> createState() => _GameWidgetARState();
+}
+
+class CameraAR extends Camera {
+  CameraAR(this.fovY, this.viewMatrix);
+
+  double fovY;
+  Matrix4 viewMatrix;
+
+  @override
+  Matrix4 computeTransform(double aspectRatio) {
+    return matrix4Perspective(fovY, aspectRatio, 0.1, 1000) * viewMatrix;
+  }
+}
+
+class _GameWidgetARState extends State<GameWidgetAR> {
+  Ticker? tick;
+  double time = 0;
+  double deltaSeconds = 0;
+
+  final KinematicPlayer player = KinematicPlayer();
+  final CoinCollection coins = CoinCollection();
+
+  @override
+  void initState() {
+    tick = Ticker(
+      (elapsed) {
+        setState(() {
+          double previousTime = time;
+          time = elapsed.inMilliseconds / 1000.0;
+          deltaSeconds = previousTime > 0 ? time - previousTime : 0;
+        });
+      },
+    );
+    tick!.start();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final yScale = widget.projectionMatrix[5];
+    final yFov = 2 * atan(1 / yScale);
+
+    final Offset center = Offset(
+            MediaQuery.of(context).size.width,
+            MediaQuery.of(context).size.height -
+                (Scaffold.of(context).appBarMaxHeight ?? 0)) /
+        2;
+    final double inputMapping = 1 / math.min(center.dx, center.dy);
+
+    final translation = -widget.viewMatrix.getTranslation();
+    //debugPrint('view: ${widget.viewMatrix.getTranslation()}');
+    //debugPrint('anchor: ${widget.anchorTransform.getTranslation()}');
+    final anchorTranslation = widget.anchorTransform.getTranslation();
+
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onScaleStart: (details) {
+        var dir = (details.localFocalPoint - center) * inputMapping;
+        player.inputDirection = Vector2(dir.dx, -dir.dy);
+      },
+      onScaleUpdate: (details) {
+        var dir = (details.localFocalPoint - center) * inputMapping;
+        player.inputDirection = Vector2(dir.dx, -dir.dy);
+      },
+      onScaleEnd: (details) {
+        player.inputDirection = Vector2.zero();
+      },
+      child: SceneBox(
+        root: Node.transform(
+          transform: widget.anchorTransform *
+              Matrix4.compose(
+                -anchorTranslation,
+                Quaternion.identity(),
+                Vector3(1, -1, -1) / 10, //
+              ),
+          children: [
+            player.update(deltaSeconds),
+            coins.update(player.position, deltaSeconds),
+          ],
+        ),
+        camera: Camera(
+          fovRadiansY: -yFov,
+          //position: translation,
+          //target: translation + Vector3(-1, 0, 0),
+          position: translation,
+          target: translation + widget.viewMatrix.forward,
+          up: widget.viewMatrix.up,
+        ),
+        //camera: CameraAR(
+        //  yFov,
+        //  widget.viewMatrix *
+        //      Matrix4(
+        //        -1, 0, 0, 0, //
+        //        0, 1, 0, 0, //
+        //        0, 0, -1, 0, //
+        //        0, 0, 0, 1, //
+        //      ),
+        //),
       ),
     );
   }
