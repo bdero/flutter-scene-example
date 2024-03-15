@@ -37,13 +37,9 @@ class DemoPage extends StatefulWidget {
 }
 
 class _DemoPageState extends State<DemoPage> {
-  int widgetIndex = 0;
-
   @override
   Widget build(BuildContext context) {
-    final widgets = [const GameWidget()];
-
-    return Scaffold(
+    return const Scaffold(
       body: GameWidget(),
     );
   }
