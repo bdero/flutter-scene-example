@@ -4,7 +4,7 @@ import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 class KinematicPlayer {
-  /// 1/n seconds from zero veclocity to full velocity.
+  /// 1/n seconds from zero velocity to full velocity.
   final double kAccelerationRate = 8;
 
   /// 1/n seconds from full velocity to zero velocity.
@@ -12,7 +12,7 @@ class KinematicPlayer {
   final double kFrictionRate = 4;
 
   /// Meters per second (Dash's body is exactly 2 meters wide).
-  final double kMaxSpeed = 8;
+  final double kMaxSpeed = 12;
 
   Vector3 _position = Vector3.zero();
   Vector3 get position {
@@ -46,7 +46,7 @@ class KinematicPlayer {
     Node characterModel = Node.asset("models/dash.glb");
     characterModel.setAnimationState("Walk", false, true, 0.0, 1.0);
     characterModel.setAnimationState("Idle", true, true, 1 - speed, 1.2);
-    characterModel.setAnimationState("Run", true, true, speed, 0.9);
+    characterModel.setAnimationState("Run", true, true, speed, 1.2);
     //characterModel.setAnimationState("Blink", true, true, 1.0, 1.0);
 
     return Node.transform(
