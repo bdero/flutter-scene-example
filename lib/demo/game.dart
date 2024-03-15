@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_scene/scene.dart';
 import 'package:flutter_scene/camera.dart';
 import 'package:vector_math/vector_math_64.dart';
@@ -230,12 +231,57 @@ class _GameWidgetState extends State<GameWidget> {
   double time = 0;
   double deltaSeconds = 0;
 
+  Map<String, double> rawInputState = {
+    "W": 0,
+    "A": 0,
+    "S": 0,
+    "D": 0,
+    "Arrow Up": 0,
+    "Arrow Left": 0,
+    "Arrow Down": 0,
+    "Arrow Right": 0,
+    " ": 0,
+  };
+
   final KinematicPlayer player = KinematicPlayer();
   final FollowCamera camera = FollowCamera();
   final CoinCollection coins = CoinCollection();
 
+  bool _onKey(KeyEvent event) {
+    final key = event.logicalKey.keyLabel;
+
+    if (event is KeyDownEvent) {
+      if (rawInputState.containsKey(key)) {
+        rawInputState[key] = 1;
+      }
+      print("Key down: $key, new state: ${rawInputState[key]}");
+    } else if (event is KeyUpEvent) {
+      if (rawInputState.containsKey(key)) {
+        rawInputState[key] = 0;
+      }
+      print("Key up: $key, new state: ${rawInputState[key]}");
+    } else if (event is KeyRepeatEvent) {
+      print("Key repeat: $key");
+    }
+
+    player.inputDirection = Vector2(
+          (rawInputState["D"]! - rawInputState["A"]!).toDouble(),
+          (rawInputState["W"]! - rawInputState["S"]!).toDouble(),
+        ) +
+        Vector2(
+          (rawInputState["Arrow Right"]! - rawInputState["Arrow Left"]!)
+              .toDouble(),
+          (rawInputState["Arrow Up"]! - rawInputState["Arrow Down"]!)
+              .toDouble(),
+        );
+
+    return false;
+  }
+
   @override
   void initState() {
+    ServicesBinding.instance.keyboard.addHandler(_onKey);
+
     tick = Ticker(
       (elapsed) {
         setState(() {
@@ -247,6 +293,11 @@ class _GameWidgetState extends State<GameWidget> {
     );
     tick!.start();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
