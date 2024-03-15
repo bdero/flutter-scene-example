@@ -187,7 +187,7 @@ class Coin {
     }
     if (collected) {
       collectAnimation = math.min(1, collectAnimation + deltaSeconds * 2);
-      position.y = startAnimPosition.y + math.sin(collectAnimation * 5) * 0.4;
+      position.y = startAnimPosition.y + math.sin(collectAnimation * 5) * 0.2;
       rotation += deltaSeconds * 10;
     }
 
@@ -275,7 +275,7 @@ class _GameWidgetState extends State<GameWidget> {
               .toDouble(),
         );
 
-    return false;
+    return rawInputState.containsKey(key);
   }
 
   @override
