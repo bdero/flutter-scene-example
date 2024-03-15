@@ -41,53 +41,10 @@ class _DemoPageState extends State<DemoPage> {
 
   @override
   Widget build(BuildContext context) {
-    final widgets = [const DashWidget(), const GameWidget()];
+    final widgets = [const GameWidget()];
 
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            AnimatedOpacity(
-              opacity: widgetIndex > 0 ? 1 : 0,
-              duration: const Duration(milliseconds: 300),
-              child: IconButton(
-                onPressed: () => setState(() {
-                  widgetIndex = max(0, widgetIndex - 1);
-                }),
-                icon: const Icon(Icons.arrow_back_ios),
-              ),
-            ),
-            const Expanded(
-                child: Text(
-              'Scene Demo',
-              textAlign: TextAlign.center,
-            )),
-            AnimatedOpacity(
-              opacity: widgetIndex < widgets.length - 1 ? 1 : 0,
-              duration: const Duration(milliseconds: 300),
-              child: IconButton(
-                onPressed: () => setState(() {
-                  widgetIndex = min(widgets.length - 1, widgetIndex + 1);
-                }),
-                icon: const Icon(Icons.arrow_forward_ios),
-              ),
-            ),
-          ],
-        ),
-      ),
-      extendBodyBehindAppBar: false,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(child: widgets[widgetIndex]
-              //child: IndexedStack(
-              //  index: widgetIndex,
-              //  children: widgets,
-              //),
-              ),
-        ],
-      ),
+      body: GameWidget(),
     );
   }
 }
