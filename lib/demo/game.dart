@@ -9,7 +9,7 @@ import 'package:flutter_scene/camera.dart';
 import 'package:scene_demo/demo/camera.dart';
 import 'package:scene_demo/demo/coin.dart';
 import 'package:scene_demo/demo/player.dart';
-import 'package:scene_demo/demo/player_controller.dart';
+import 'package:scene_demo/demo/input_actions.dart';
 import 'package:vector_math/vector_math_64.dart' as vm;
 
 class GameWidget extends StatefulWidget {
@@ -37,13 +37,15 @@ class CoinController {
     Coin(vm.Vector3(7 + 2 * 3, 1.5, -16 + 1.3 * 3)),
   ];
 
-  Node update(vm.Vector3 playerPosition, double deltaSeconds) {
+  void update(vm.Vector3 playerPosition, double deltaSeconds) {
+    for (var coin in coins) {
+      coin.update(playerPosition, deltaSeconds);
+    }
+  }
+
+  Node get node {
     return Node(
-      // TODO(bdero): Can this be made more efficient?
-      children: coins
-          .map((coin) => coin.update(playerPosition, deltaSeconds))
-          .whereType<Node>()
-          .toList(growable: false),
+      children: coins.map((coin) => coin.node).toList(growable: false),
     );
   }
 }
@@ -117,17 +119,21 @@ String secondsToFormattedTime(double seconds) {
 }
 
 class _GameWidgetState extends State<GameWidget> {
+  bool playingGame = false;
+
   Ticker? tick;
   double time = 0;
   double deltaSeconds = 0;
 
-  final PlayerController playerController = PlayerController();
-  final KinematicPlayer player = KinematicPlayer();
+  final InputActions inputActions = InputActions();
   final FollowCamera camera = FollowCamera();
-  final CoinController coins = CoinController();
+  KinematicPlayer? player;
+  CoinController? coins;
 
   @override
   void initState() {
+    startMenu();
+
     tick = Ticker(
       (elapsed) {
         setState(() {
@@ -141,6 +147,20 @@ class _GameWidgetState extends State<GameWidget> {
     super.initState();
   }
 
+  void startGame() {
+    playingGame = true;
+    time = 0;
+    player = KinematicPlayer();
+    coins = CoinController();
+  }
+
+  void startMenu() {
+    playingGame = false;
+    time = 0;
+    player = null;
+    coins = null;
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -148,55 +168,76 @@ class _GameWidgetState extends State<GameWidget> {
 
   @override
   Widget build(BuildContext context) {
-    playerController.updatePlayer(player);
-    player.update(deltaSeconds);
+    if (playingGame) {
+      inputActions.updatePlayer(player!);
+      player!.update(deltaSeconds);
+      coins!.update(player!.position, deltaSeconds);
+      camera.updateGameplay(
+          player!.position,
+          vm.Vector3(player!.velocityXZ.x, 0, player!.velocityXZ.y) *
+              player!.kMaxSpeed,
+          deltaSeconds);
+    } else {
+      camera.updateOverview(deltaSeconds, time);
+
+      // If any button is pressed, begin the game.
+      if (inputActions.keyboardInputState.values.any((value) => value > 0) ||
+          inputActions.gamepadInputState.values.any((value) => value > 0) ||
+          inputActions.inputDirection.length2 > 0) {
+        startGame();
+      }
+    }
 
     return Stack(
       children: [
-        playerController.getControlWidget(
+        inputActions.getControlWidget(
           context,
           SceneBox(
             root: Node(children: [
               Node.asset("models/ground.glb"),
-              player.node,
+              if (player != null) player!.node,
               Node.transform(
                 transform:
                     Matrix4.translation(camera.position) * Matrix4.rotationY(3),
                 children: [Node.asset("models/sky_sphere.glb")],
               ),
-              coins.update(player.position, deltaSeconds),
+              if (coins != null) coins!.node,
             ]),
-            camera: camera.update(
-                player.position,
-                vm.Vector3(player.velocityXZ.x, 0, player.velocityXZ.y) *
-                    player.kMaxSpeed,
-                deltaSeconds),
+            camera: camera.camera,
           ),
         ),
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              child: HUDBox(
-                child: HUDLabelText(
-                  label: "Coins: ",
-                  value:
-                      "${coins.coins.where((coin) => coin.collected).length}",
+        if (playingGame)
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(20),
+                child: HUDBox(
+                  child: HUDLabelText(
+                    label: "Coins: ",
+                    value:
+                        "${coins!.coins.where((coin) => coin.collected).length}",
+                  ),
                 ),
               ),
-            ),
-            const Spacer(),
-            Container(
-              padding: const EdgeInsets.all(20),
-              child: HUDBox(
-                child: HUDLabelText(
-                  label: "Time: ",
-                  value: secondsToFormattedTime(time),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.all(20),
+                child: HUDBox(
+                  child: HUDLabelText(
+                    label: "Time: ",
+                    value: secondsToFormattedTime(time),
+                  ),
                 ),
               ),
+            ],
+          ),
+        if (!playingGame)
+          Center(
+            child: ElevatedButton(
+              onPressed: startGame,
+              child: const Text("Start Game"),
             ),
-          ],
-        ),
+          ),
       ],
     );
   }

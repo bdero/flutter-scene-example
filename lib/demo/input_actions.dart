@@ -8,8 +8,12 @@ import 'package:gamepads/gamepads.dart';
 import 'package:scene_demo/demo/player.dart';
 import 'package:vector_math/vector_math_64.dart';
 
-class PlayerController {
-  PlayerController() {
+/// Reads and converts raw input data from the mouse/keyboard/gamepad into high
+/// level events and state.
+///
+/// Only one instance of this class should be created.
+class InputActions {
+  InputActions() {
     ServicesBinding.instance.keyboard.addHandler(_onKeyEvent);
 
     Gamepads.list().then((gamepads) {

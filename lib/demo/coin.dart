@@ -24,9 +24,9 @@ class Coin {
     );
   }
 
-  Node? update(Vector3 playerPosition, double deltaSeconds) {
+  void update(Vector3 playerPosition, double deltaSeconds) {
     if (collected && collectAnimation == 1) {
-      return null;
+      return;
     }
 
     if (!collected) {
@@ -43,7 +43,5 @@ class Coin {
     }
 
     rotation += deltaSeconds * 2;
-
-    return node;
   }
 }
