@@ -90,20 +90,23 @@ class HUDLabelText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final style = DefaultTextStyle.of(context).style;
+    final valueStyle = style.copyWith(
+      fontWeight: FontWeight.bold,
+      fontFamily: "monospace",
+      fontFamilyFallback: ["Courier"],
+    );
+
     return RichText(
       softWrap: false,
       overflow: TextOverflow.clip,
       text: TextSpan(
-        style: DefaultTextStyle.of(context).style,
+        style: style,
         text: label,
         children: [
           TextSpan(
+            style: valueStyle,
             text: value,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontFamily: "monospace",
-              fontFamilyFallback: ["Courier"],
-            ),
           ),
         ],
       ),
@@ -125,6 +128,8 @@ class _GameWidgetState extends State<GameWidget> {
   double time = 0;
   double deltaSeconds = 0;
 
+  static const kTimeLimit = 10; // Seconds.
+
   final InputActions inputActions = InputActions();
   final FollowCamera camera = FollowCamera();
   KinematicPlayer? player;
@@ -132,8 +137,6 @@ class _GameWidgetState extends State<GameWidget> {
 
   @override
   void initState() {
-    startMenu();
-
     tick = Ticker(
       (elapsed) {
         setState(() {
@@ -143,22 +146,36 @@ class _GameWidgetState extends State<GameWidget> {
         });
       },
     );
-    tick!.start();
+
+    startMenu();
+
     super.initState();
   }
 
+  void resetTimer() {
+    setState(() {
+      tick!.stop();
+      time = 0;
+      tick!.start();
+    });
+  }
+
   void startGame() {
-    playingGame = true;
-    time = 0;
-    player = KinematicPlayer();
-    coins = CoinController();
+    setState(() {
+      playingGame = true;
+      resetTimer();
+      player = KinematicPlayer();
+      coins = CoinController();
+    });
   }
 
   void startMenu() {
-    playingGame = false;
-    time = 0;
-    player = null;
-    coins = null;
+    setState(() {
+      playingGame = false;
+      resetTimer();
+      player = null;
+      coins = null;
+    });
   }
 
   @override
@@ -168,6 +185,7 @@ class _GameWidgetState extends State<GameWidget> {
 
   @override
   Widget build(BuildContext context) {
+    double secondsRemaining = math.max(0, kTimeLimit - time);
     if (playingGame) {
       inputActions.updatePlayer(player!);
       player!.update(deltaSeconds);
@@ -177,13 +195,16 @@ class _GameWidgetState extends State<GameWidget> {
           vm.Vector3(player!.velocityXZ.x, 0, player!.velocityXZ.y) *
               player!.kMaxSpeed,
           deltaSeconds);
+
+      if (secondsRemaining <= 0) {
+        startMenu();
+      }
     } else {
       camera.updateOverview(deltaSeconds, time);
 
       // If any button is pressed, begin the game.
       if (inputActions.keyboardInputState.values.any((value) => value > 0) ||
-          inputActions.gamepadInputState.values.any((value) => value > 0) ||
-          inputActions.inputDirection.length2 > 0) {
+          inputActions.gamepadInputState.values.any((value) => value > 0)) {
         startGame();
       }
     }
@@ -213,7 +234,7 @@ class _GameWidgetState extends State<GameWidget> {
                 padding: const EdgeInsets.all(20),
                 child: HUDBox(
                   child: HUDLabelText(
-                    label: "Coins: ",
+                    label: "💰 ",
                     value:
                         "${coins!.coins.where((coin) => coin.collected).length}",
                   ),
@@ -224,18 +245,23 @@ class _GameWidgetState extends State<GameWidget> {
                 padding: const EdgeInsets.all(20),
                 child: HUDBox(
                   child: HUDLabelText(
-                    label: "Time: ",
-                    value: secondsToFormattedTime(time),
+                    label: "⏱ ",
+                    value: secondsToFormattedTime(secondsRemaining),
                   ),
                 ),
               ),
             ],
           ),
         if (!playingGame)
-          Center(
-            child: ElevatedButton(
-              onPressed: startGame,
-              child: const Text("Start Game"),
+          const Center(
+            child: HUDBox(
+              child: Text(
+                "Press any button to start",
+                style: TextStyle(
+                  fontSize: 40,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
       ],
