@@ -109,6 +109,13 @@ class HUDLabelText extends StatelessWidget {
   }
 }
 
+String secondsToFormattedTime(double seconds) {
+  int minutes = (seconds / 60).floor();
+  int remainingSeconds = (seconds % 60).floor();
+  int remainingHundredths = ((seconds * 100) % 100).floor();
+  return "${minutes.toString().padLeft(2, "0")}:${remainingSeconds.toString().padLeft(2, "0")}.${remainingHundredths.toString().padLeft(2, "0")}";
+}
+
 class _GameWidgetState extends State<GameWidget> {
   Ticker? tick;
   double time = 0;
@@ -166,14 +173,29 @@ class _GameWidgetState extends State<GameWidget> {
                 deltaSeconds),
           ),
         ),
-        Container(
-          padding: const EdgeInsets.all(20),
-          child: HUDBox(
-            child: HUDLabelText(
-              label: "Coins: ",
-              value: "${coins.coins.where((coin) => coin.collected).length}",
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              child: HUDBox(
+                child: HUDLabelText(
+                  label: "Coins: ",
+                  value:
+                      "${coins.coins.where((coin) => coin.collected).length}",
+                ),
+              ),
             ),
-          ),
+            const Spacer(),
+            Container(
+              padding: const EdgeInsets.all(20),
+              child: HUDBox(
+                child: HUDLabelText(
+                  label: "Time: ",
+                  value: secondsToFormattedTime(time),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
