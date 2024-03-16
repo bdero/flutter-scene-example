@@ -1,15 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter_scene/camera.dart';
+import 'package:scene_demo/demo/math_utils.dart';
 import 'package:vector_math/vector_math_64.dart';
-
-Vector3 vector3Lerp(Vector3 a, Vector3 b, double t) {
-  return a + (b - a) * t;
-}
-
-Vector3 vector3LerpDeltaTime(Vector3 a, Vector3 b, double t, double deltaTime) {
-  return vector3Lerp(a, b, math.min(1, 1 - math.pow(t, deltaTime).toDouble()));
-}
 
 class FollowCamera {
   static final Vector3 kFollowOffset = Vector3(0, 10, -12);
