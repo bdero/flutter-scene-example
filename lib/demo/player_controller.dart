@@ -1,17 +1,34 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:gamepads/gamepads.dart';
 import 'package:scene_demo/demo/player.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 class PlayerController {
   PlayerController() {
-    ServicesBinding.instance.keyboard.addHandler(_onKey);
+    ServicesBinding.instance.keyboard.addHandler(_onKeyEvent);
+
+    Gamepads.list().then((gamepads) {
+      print("Number of gamepads found: ${gamepads.length}");
+      for (var gamepad in gamepads) {
+        print(" -> id: ${gamepad.id}, name: '${gamepad.name}'");
+      }
+    });
+    gamepadSubscription =
+        Gamepads.events.listen(_onGamepadEvent, onError: (error) {
+      print("Gamepad event stream error: $error");
+    }, onDone: () {
+      print("Gamepad event stream done.");
+    }, cancelOnError: false);
   }
 
-  Map<String, double> rawInputState = {
+  late StreamSubscription<GamepadEvent> gamepadSubscription;
+
+  Map<String, double> keyboardInputState = {
     "W": 0,
     "A": 0,
     "S": 0,
@@ -23,41 +40,76 @@ class PlayerController {
     " ": 0,
   };
 
+  Map<String, double> gamepadInputState = {
+    "l.joystick - xAxis": 0,
+    "l.joystick - yAxis": 0,
+    "r.joystick - xAxis": 0,
+    "r.joystick - yAxis": 0,
+    "dpad - xAxis": 0,
+    "dpad - yAxis": 0,
+    "a.circle": 0,
+    "b.circle": 0,
+    "x.circle": 0,
+    "y.circle": 0,
+    "minus.circle": 0,
+    "plus.circle": 0,
+  };
+
   Vector2 inputDirection = Vector2.zero();
 
   void updatePlayer(KinematicPlayer player) {
     player.inputDirection = inputDirection;
   }
 
-  bool _onKey(KeyEvent event) {
+  bool _onKeyEvent(KeyEvent event) {
     final key = event.logicalKey.keyLabel;
 
     if (event is KeyDownEvent) {
-      if (rawInputState.containsKey(key)) {
-        rawInputState[key] = 1;
+      if (keyboardInputState.containsKey(key)) {
+        keyboardInputState[key] = 1;
       }
-      print("Key down: $key, new state: ${rawInputState[key]}");
+      print("Key down: $key, new state: ${keyboardInputState[key]}");
     } else if (event is KeyUpEvent) {
-      if (rawInputState.containsKey(key)) {
-        rawInputState[key] = 0;
+      if (keyboardInputState.containsKey(key)) {
+        keyboardInputState[key] = 0;
       }
-      print("Key up: $key, new state: ${rawInputState[key]}");
+      print("Key up: $key, new state: ${keyboardInputState[key]}");
     } else if (event is KeyRepeatEvent) {
       print("Key repeat: $key");
     }
 
     inputDirection = Vector2(
-          (rawInputState["D"]! - rawInputState["A"]!).toDouble(),
-          (rawInputState["W"]! - rawInputState["S"]!).toDouble(),
+          (keyboardInputState["D"]! - keyboardInputState["A"]!).toDouble(),
+          (keyboardInputState["W"]! - keyboardInputState["S"]!).toDouble(),
         ) +
         Vector2(
-          (rawInputState["Arrow Right"]! - rawInputState["Arrow Left"]!)
+          (keyboardInputState["Arrow Right"]! -
+                  keyboardInputState["Arrow Left"]!)
               .toDouble(),
-          (rawInputState["Arrow Up"]! - rawInputState["Arrow Down"]!)
+          (keyboardInputState["Arrow Up"]! - keyboardInputState["Arrow Down"]!)
               .toDouble(),
         );
 
-    return rawInputState.containsKey(key);
+    return keyboardInputState.containsKey(key);
+  }
+
+  void _onGamepadEvent(GamepadEvent event) {
+    print("Gamepad data: ${event}");
+
+    if (gamepadInputState.containsKey(event.key)) {
+      gamepadInputState[event.key] = event.value;
+    }
+
+    inputDirection = Vector2(
+          gamepadInputState["l.joystick - xAxis"]! +
+              gamepadInputState["dpad - xAxis"]!,
+          gamepadInputState["l.joystick - yAxis"]! +
+              gamepadInputState["dpad - yAxis"]!,
+        ) +
+        Vector2(
+          gamepadInputState["dpad - xAxis"]!,
+          gamepadInputState["dpad - yAxis"]!,
+        );
   }
 
   Widget getControlWidget(BuildContext context, Widget child) {
