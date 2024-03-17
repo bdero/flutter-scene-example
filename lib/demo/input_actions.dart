@@ -59,6 +59,7 @@ class InputActions {
     "plus.circle": 0,
   };
 
+  bool absorbKeyEvents = false;
   Vector2 inputDirection = Vector2.zero();
 
   void updatePlayer(KinematicPlayer player) {
@@ -94,7 +95,7 @@ class InputActions {
               .toDouble(),
         );
 
-    return keyboardInputState.containsKey(key);
+    return absorbKeyEvents && keyboardInputState.containsKey(key);
   }
 
   void _onGamepadEvent(GamepadEvent event) {

@@ -1,11 +1,14 @@
+import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_scene/scene.dart';
 import 'package:scene_demo/demo/camera.dart';
 import 'package:scene_demo/demo/coin.dart';
+import 'package:scene_demo/demo/leaderboard.dart';
 import 'package:scene_demo/demo/player.dart';
 import 'package:scene_demo/demo/input_actions.dart';
 import 'package:scene_demo/demo/spawn.dart';
@@ -16,6 +19,8 @@ class GameState {
   GameState({
     required this.player,
   });
+
+  static const kTimeLimit = 5; // Seconds.
 
   final KinematicPlayer player;
   int coinsCollected = 0;
@@ -102,19 +107,59 @@ String secondsToFormattedTime(double seconds) {
   return "${minutes.toString().padLeft(2, "0")}:${remainingSeconds.toString().padLeft(2, "0")}.${remainingHundredths.toString().padLeft(2, "0")}";
 }
 
+class GameplayHUD extends StatelessWidget {
+  const GameplayHUD({super.key, required this.gameState, required this.time});
+  final GameState gameState;
+  final double time;
+
+  @override
+  Widget build(BuildContext context) {
+    double secondsRemaining = math.max(0, GameState.kTimeLimit - time);
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(20),
+          child: HUDBox(
+            child: HUDLabelText(
+              label: "💰 ",
+              value: gameState!.coinsCollected.toString().padLeft(3, "0"),
+            ),
+          ),
+        ),
+        const Spacer(),
+        Container(
+          padding: const EdgeInsets.all(20),
+          child: HUDBox(
+            child: HUDLabelText(
+              label: "⏱ ",
+              value: secondsToFormattedTime(secondsRemaining),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+enum GameMode {
+  startMenu,
+  playing,
+  leaderboardEntry,
+}
+
 class _GameWidgetState extends State<GameWidget> {
-  bool playingGame = false;
+  GameMode gameMode = GameMode.startMenu;
 
   Ticker? tick;
   double time = 0;
   double deltaSeconds = 0;
 
-  static const kTimeLimit = 30; // Seconds.
-
   final InputActions inputActions = InputActions();
   final FollowCamera camera = FollowCamera();
   GameState? gameState;
   SpawnController? spawnController;
+
+  int lastScore = 0;
 
   @override
   void initState() {
@@ -127,8 +172,9 @@ class _GameWidgetState extends State<GameWidget> {
         });
       },
     );
+    resetTimer();
 
-    startMenu();
+    gotoStartMenu();
 
     super.initState();
   }
@@ -141,9 +187,10 @@ class _GameWidgetState extends State<GameWidget> {
     });
   }
 
-  void startGame() {
+  void gotoGame() {
     setState(() {
-      playingGame = true;
+      inputActions.absorbKeyEvents = true;
+      gameMode = GameMode.playing;
       resetTimer();
       gameState = GameState(
         player: KinematicPlayer(),
@@ -152,10 +199,21 @@ class _GameWidgetState extends State<GameWidget> {
     });
   }
 
-  void startMenu() {
+  void gotoStartMenu() {
     setState(() {
-      playingGame = false;
+      inputActions.absorbKeyEvents = true;
+      gameMode = GameMode.startMenu;
+      gameState = null;
+      spawnController = null;
+    });
+  }
+
+  void gotoLeaderboardEntry() {
+    setState(() {
+      inputActions.absorbKeyEvents = false;
+      gameMode = GameMode.leaderboardEntry;
       resetTimer();
+      lastScore = gameState!.coinsCollected;
       gameState = null;
       spawnController = null;
     });
@@ -168,8 +226,10 @@ class _GameWidgetState extends State<GameWidget> {
 
   @override
   Widget build(BuildContext context) {
-    double secondsRemaining = math.max(0, kTimeLimit - time);
-    if (playingGame) {
+    print(Directory.current.path);
+    if (gameMode == GameMode.playing) {
+      // If the game is playing, update the player and camera.
+      double secondsRemaining = math.max(0, GameState.kTimeLimit - time);
       inputActions.updatePlayer(gameState!.player);
       gameState!.player.update(deltaSeconds);
       spawnController!.update(deltaSeconds);
@@ -181,15 +241,17 @@ class _GameWidgetState extends State<GameWidget> {
           deltaSeconds);
 
       if (secondsRemaining <= 0) {
-        startMenu();
+        gotoLeaderboardEntry();
       }
     } else {
+      // If we're in the menus, slowly rotate the camera.
       camera.updateOverview(deltaSeconds, time);
-
+    }
+    if (gameMode == GameMode.startMenu) {
       // If any button is pressed, begin the game.
       if (inputActions.keyboardInputState.values.any((value) => value > 0) ||
           inputActions.gamepadInputState.values.any((value) => value > 0)) {
-        startGame();
+        gotoGame();
       }
     }
 
@@ -200,52 +262,44 @@ class _GameWidgetState extends State<GameWidget> {
           SceneBox(
             root: Node(children: [
               Node.asset("models/ground.glb"),
-              if (gameState != null) gameState!.player.node,
               Node.transform(
                 transform:
                     Matrix4.translation(camera.position) * Matrix4.rotationY(3),
                 children: [Node.asset("models/sky_sphere.glb")],
               ),
-              if (spawnController != null) spawnController!.node,
+              if (gameMode == GameMode.playing) gameState!.player.node,
+              if (gameMode == GameMode.playing) spawnController!.node,
             ]),
             camera: camera.camera,
           ),
         ),
-        if (playingGame)
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                child: HUDBox(
-                  child: HUDLabelText(
-                    label: "💰 ",
-                    value: gameState!.coinsCollected.toString().padLeft(3, "0"),
+        if (gameMode == GameMode.playing)
+          GameplayHUD(gameState: gameState!, time: time),
+        if (gameMode == GameMode.startMenu)
+          Animate(
+            child: const Center(
+              child: HUDBox(
+                child: Text(
+                  "Press any button to start",
+                  style: TextStyle(
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold,
                   ),
-                ),
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.all(20),
-                child: HUDBox(
-                  child: HUDLabelText(
-                    label: "⏱ ",
-                    value: secondsToFormattedTime(secondsRemaining),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        if (!playingGame)
-          const Center(
-            child: HUDBox(
-              child: Text(
-                "Press any button to start",
-                style: TextStyle(
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
+          )
+              .animate()
+              .fade()
+              .slide(duration: 1.5.seconds, curve: Curves.bounceOut)
+              .flip(),
+        if (gameMode == GameMode.leaderboardEntry)
+          Center(
+            child: LeaderboardForm(
+                score: lastScore,
+                onSubmit: () {
+                  gotoStartMenu();
+                }),
           ),
       ],
     );
