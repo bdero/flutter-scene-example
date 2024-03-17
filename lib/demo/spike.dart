@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter_scene/scene.dart';
+import 'package:scene_demo/demo/coin.dart';
 import 'package:scene_demo/demo/game.dart';
 import 'package:scene_demo/demo/math_utils.dart';
 import 'package:vector_math/vector_math_64.dart';
@@ -47,7 +48,25 @@ class Spike {
       if (distance < 2.2) {
         destroyed = true;
         startDestroyPosition = position;
-        gameState.player.takeDamage();
+        if (gameState.player.takeDamage()) {
+          final coinsLost = math.min(10, gameState.coinsCollected);
+          gameState.coinsCollected -= coinsLost;
+
+          // Coin shower.
+          for (int i = 0; i < coinsLost; i++) {
+            final xzAngle = i * math.pi * 2 / coinsLost;
+            final direction = Vector3(
+                    math.cos(xzAngle), //
+                    5, //
+                    math.sin(xzAngle))
+                .normalized();
+            gameState.coins.add(Coin(
+              gameState,
+              gameState.player.position + direction * 2.3,
+              direction * 15,
+            ));
+          }
+        }
       }
     }
 

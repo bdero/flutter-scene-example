@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_scene/scene.dart';
 import 'package:scene_demo/demo/camera.dart';
+import 'package:scene_demo/demo/coin.dart';
 import 'package:scene_demo/demo/player.dart';
 import 'package:scene_demo/demo/input_actions.dart';
 import 'package:scene_demo/demo/spawn.dart';
+import 'package:scene_demo/demo/spike.dart';
 import 'package:vector_math/vector_math_64.dart' as vm;
 
 class GameState {
@@ -17,6 +19,9 @@ class GameState {
 
   final KinematicPlayer player;
   int coinsCollected = 0;
+
+  final List<Coin> coins = [];
+  final List<Spike> spikes = [];
 }
 
 class GameWidget extends StatefulWidget {

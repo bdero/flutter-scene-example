@@ -172,8 +172,6 @@ class SpawnController {
     ),
   ];
   final List<SpawnPattern> activePatterns = [];
-  final List<Coin> coins = [];
-  final List<Spike> spikes = [];
 
   int nextRuleIndex = 0;
   double timeElapsed = 0;
@@ -193,9 +191,9 @@ class SpawnController {
       final updateResult = pattern.update(
           gameState.player.position, deltaSeconds, (vm.Vector3 position) {
         if (rules[i].spawnType == SpawnType.eCoin) {
-          coins.add(Coin(gameState, position));
+          gameState.coins.add(Coin(gameState, position, vm.Vector3(0, 12, 0)));
         } else if (rules[i].spawnType == SpawnType.eSpike) {
-          spikes.add(Spike(gameState, position));
+          gameState.spikes.add(Spike(gameState, position));
         }
       });
       if (!updateResult) {
@@ -203,16 +201,16 @@ class SpawnController {
       }
     }
 
-    for (int i = coins.length - 1; i >= 0; i--) {
-      Coin coin = coins[i];
+    for (int i = gameState.coins.length - 1; i >= 0; i--) {
+      Coin coin = gameState.coins[i];
       if (!coin.update(deltaSeconds)) {
-        coins.removeAt(i);
+        gameState.coins.removeAt(i);
       }
     }
-    for (int i = spikes.length - 1; i >= 0; i--) {
-      Spike spike = spikes[i];
+    for (int i = gameState.spikes.length - 1; i >= 0; i--) {
+      Spike spike = gameState.spikes[i];
       if (!spike.update(deltaSeconds)) {
-        spikes.removeAt(i);
+        gameState.spikes.removeAt(i);
       }
     }
   }
@@ -220,8 +218,8 @@ class SpawnController {
   Node get node {
     return Node(
       children: [
-        for (var coin in coins) coin.node,
-        for (var spike in spikes) spike.node,
+        for (var coin in gameState.coins) coin.node,
+        for (var spike in gameState.spikes) spike.node,
       ],
     );
   }

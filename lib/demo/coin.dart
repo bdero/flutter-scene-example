@@ -8,11 +8,12 @@ import 'package:vector_math/vector_math_64.dart';
 class Coin {
   static const kRestingHeight = 1.5;
 
-  Coin(this.gameState, this.position);
+  Coin(this.gameState, this.position, this.velocity);
 
   final GameState gameState;
 
   Vector3 position;
+  Vector3 velocity;
   double rotation = 0;
   bool collected = false;
 
@@ -42,6 +43,26 @@ class Coin {
     }
 
     if (!collected) {
+      // Deal with gravity and bouncing.
+      if (!(position.y == kRestingHeight && velocity.y == 0)) {
+        velocity.y -= 9.8 * 4 * deltaSeconds;
+        position += velocity * deltaSeconds;
+
+        // Bounce at the resting height.
+        if (position.y < kRestingHeight) {
+          position.y = kRestingHeight + (kRestingHeight - position.y);
+          velocity.y *= -0.5;
+          if (velocity.y.abs() < 0.2) {
+            position.y = kRestingHeight;
+            velocity.y = 0;
+          }
+        }
+        // Once at the resting height, apply friction.
+      } else if (velocity.length2 > 0) {
+        velocity.xz /= math.pow(8, deltaSeconds).toDouble();
+        position.xz += velocity.xz * deltaSeconds;
+      }
+
       double distance = (gameState.player.position - position).length;
       if (distance < 2.2) {
         collected = true;
