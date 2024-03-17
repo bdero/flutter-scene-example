@@ -1,7 +1,9 @@
+import 'dart:math' as math;
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:scene_demo/demo/game.dart';
@@ -246,8 +248,83 @@ String getPlacementText(int index) {
   }
 }
 
+enum LeaderboardState {
+  waitingAtTop,
+  scrolling,
+  waitingAtBottom,
+  returning,
+}
+
 class _LeaderboardWidgetState extends State<LeaderboardWidget> {
   final Leaderboard _leaderboard = Leaderboard.loadLocal();
+  Ticker? _ticker;
+  double timeElapsed = 0;
+  final ScrollController _scrollController = ScrollController();
+  LeaderboardState _state = LeaderboardState.waitingAtTop;
+
+  void resetTicker() {
+    _ticker?.stop();
+    _ticker?.start();
+    timeElapsed = 0;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _ticker = Ticker((elapsed) {
+      setState(() {
+        timeElapsed = elapsed.inSeconds.toDouble();
+
+        if (_leaderboard.entries.length < 5) {
+          return;
+        }
+
+        switch (_state) {
+          case LeaderboardState.waitingAtTop:
+            if (timeElapsed > 5) {
+              _state = LeaderboardState.scrolling;
+              _scrollController.animateTo(
+                _scrollController.position.maxScrollExtent,
+                duration: (_leaderboard.entries.length - 5).seconds,
+                curve: Curves.linear,
+              );
+              resetTicker();
+            }
+            break;
+          case LeaderboardState.scrolling:
+            if (timeElapsed > _leaderboard.entries.length - 5) {
+              _state = LeaderboardState.waitingAtBottom;
+              resetTicker();
+            }
+            break;
+          case LeaderboardState.waitingAtBottom:
+            if (timeElapsed > 5) {
+              _state = LeaderboardState.returning;
+              _scrollController.animateTo(
+                0,
+                duration: 1.seconds,
+                curve: Curves.easeInOutCubic,
+              );
+              resetTicker();
+            }
+            break;
+          case LeaderboardState.returning:
+            if (timeElapsed > 1) {
+              _state = LeaderboardState.waitingAtTop;
+              resetTicker();
+            }
+            break;
+        }
+      });
+    });
+    _ticker?.start();
+  }
+
+  @override
+  void dispose() {
+    _ticker?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -271,6 +348,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
           },
           blendMode: BlendMode.dstOut,
           child: ListView.builder(
+            controller: _scrollController,
             itemCount: _leaderboard.entries.length,
             itemBuilder: (context, index) {
               return Row(
@@ -288,14 +366,16 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
                   )),
                   Expanded(
                     flex: 3,
-                    child: Text(
-                      '${index == 0 ? '👑 ' : ''}${_leaderboard.entries[index].name}',
-                      style: const TextStyle(
-                        fontFamily: 'monospace',
-                        fontFamilyFallback: ['Courier'],
+                    child: Center(
+                      child: Text(
+                        '${index == 0 ? '👑 ' : ''}${_leaderboard.entries[index].name}',
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontFamilyFallback: ['Courier'],
+                        ),
+                        overflow: TextOverflow.fade,
+                        softWrap: false,
                       ),
-                      overflow: TextOverflow.fade,
-                      softWrap: false,
                     ),
                   ),
                   Expanded(
@@ -313,13 +393,11 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
                     ),
                   ),
                 ],
-              )
-                  .animate(key: ValueKey('leaderboardrows$index'))
-                  .fade(delay: (index * 0.1).seconds)
-                  .slideY(
+              ).animate(key: ValueKey('leaderboardrows$index')).slideY(
+                    delay: (math.min(5, index) * 0.2).seconds,
                     curve: Curves.easeOutCubic,
-                    duration: 1.5.seconds,
-                    begin: 10, 
+                    duration: 0.8.seconds,
+                    begin: 10,
                     end: 0,
                   );
             },

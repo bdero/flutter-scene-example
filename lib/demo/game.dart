@@ -156,6 +156,21 @@ class SpringCurve extends Curve {
   }
 }
 
+class SheenGradientTransform extends GradientTransform {
+  double rotation;
+  vm.Vector3 translation;
+  double scale;
+
+  SheenGradientTransform(this.rotation, this.translation, this.scale);
+
+  @override
+  Matrix4 transform(Rect bounds, {TextDirection? textDirection}) {
+    return Matrix4.translation(translation) *
+        Matrix4.rotationZ(rotation) *
+        scale;
+  }
+}
+
 class _GameWidgetState extends State<GameWidget> {
   GameMode gameMode = GameMode.startMenu;
 
@@ -282,26 +297,53 @@ class _GameWidgetState extends State<GameWidget> {
           ),
         ),
         if (gameMode == GameMode.playing)
-          GameplayHUD(gameState: gameState!, time: time),
+          GameplayHUD(gameState: gameState!, time: time)
+              .animate(key: const ValueKey('gameplayHUD'))
+              .slideY(
+                curve: Curves.easeOutCubic,
+                duration: 1.5.seconds,
+                begin: -3,
+                end: 0,
+              ),
         if (gameMode == GameMode.startMenu)
           Center(
               child: Column(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Column(
+              Column(
                 children: [
                   HUDBox(
-                    child: Text(
-                      "Press any button to start",
-                      style: TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
+                    child: ShaderMask(
+                      shaderCallback: (bounds) {
+                        return LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: const [
+                              Color.fromARGB(255, 153, 221, 255),
+                              Color.fromARGB(255, 223, 177, 51),
+                              Color.fromARGB(255, 97, 216, 115),
+                              Colors.white,
+                            ],
+                            stops: const [0, 0.1, 0.9, 1],
+                            tileMode: TileMode.repeated,
+                            transform: SheenGradientTransform(
+                              -math.pi / 4,
+                              vm.Vector3(time * 100, 0, 0),
+                              10,
+                            )).createShader(bounds);
+                      },
+                      child: const Text(
+                        "Press any button to start",
+                        style: TextStyle(
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
                   SizedBox(height: 20),
-                  HUDBox(
+                  const HUDBox(
                     child: Text(
                       "🕹️ Left stick to move, 🅰️ to jump",
                       style: TextStyle(
