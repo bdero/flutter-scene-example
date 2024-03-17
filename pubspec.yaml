@@ -33,3 +33,4 @@ flutter:
     - models/dash.glb
     - models/ground.glb
     - models/coin.glb
+    - models/spike.glb

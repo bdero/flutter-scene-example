@@ -36,7 +36,13 @@ class KinematicPlayer {
     }
   }
 
+  double damageCooldown = 0;
+
   Node get node {
+    if (damageCooldown % 0.2 > 0.12) {
+      return Node();
+    }
+
     Matrix4 transform = Matrix4.translation(_position) *
         Matrix4.rotationY(
             Vector3(0, 0, -1).angleToSigned(_direction, Vector3(0, 1, 0)));
@@ -55,7 +61,21 @@ class KinematicPlayer {
     );
   }
 
+  /// Returns true if the player took damage.
+  bool takeDamage() {
+    if (damageCooldown > 0) {
+      return false;
+    }
+    damageCooldown = 2;
+    _velocityXZ = Vector2.zero();
+    return true;
+  }
+
   void update(double deltaSeconds) {
+    if (damageCooldown > 0) {
+      damageCooldown = math.max(0, damageCooldown - deltaSeconds);
+    }
+
     // Speed up when there's input.
     if (_inputDirection.length2 > 1e-3) {
       _velocityXZ += _inputDirection * kAccelerationRate * deltaSeconds;

@@ -1,11 +1,16 @@
 import 'dart:math' as math;
 
 import 'package:flutter_scene/scene.dart';
+import 'package:scene_demo/demo/game.dart';
 import 'package:scene_demo/demo/math_utils.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 class Spike {
   static const kRestingHeight = 1.5;
+
+  Spike(this.gameState, this.position);
+
+  final GameState gameState;
 
   Vector3 position;
   double rotation = 0;
@@ -15,7 +20,7 @@ class Spike {
   Vector3 startDestroyPosition = Vector3.zero();
   double destroyAnimation = 0;
 
-  Spike(this.position);
+  bool destroyed = false;
 
   Node get node {
     return Node.transform(
@@ -29,20 +34,32 @@ class Spike {
     );
   }
 
-  void update(Vector3 playerPosition, double deltaSeconds) {
+  /// Returns false when the spike has completed the destruction animation.
+  /// Returns true if the spike is still active and should continue being
+  /// updated.
+  bool update(double deltaSeconds) {
     if (destroyAnimation == 1) {
-      return;
+      return false;
     }
 
-    double distance = (playerPosition - position).length;
-    if (distance < 2.2) {
-      startDestroyPosition = position;
+    if (!destroyed) {
+      double distance = (gameState.player.position - position).length;
+      if (distance < 2.2) {
+        destroyed = true;
+        startDestroyPosition = position;
+        gameState.player.takeDamage();
+      }
     }
 
-    destroyAnimation = math.min(1, destroyAnimation + deltaSeconds * 2);
-    position.y = startDestroyPosition.y + math.sin(destroyAnimation * 5) * 0.2;
-    rotation += deltaSeconds * 10;
+    if (destroyed) {
+      destroyAnimation = math.min(1, destroyAnimation + deltaSeconds * 2);
+      position.y =
+          startDestroyPosition.y + math.sin(destroyAnimation * 5) * 0.2;
+      rotation += deltaSeconds * 10;
+    }
 
     scale = lerpDeltaTime(scale, 1, 0.1, deltaSeconds);
+
+    return true;
   }
 }

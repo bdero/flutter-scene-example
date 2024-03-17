@@ -10,6 +10,15 @@ import 'package:scene_demo/demo/input_actions.dart';
 import 'package:scene_demo/demo/spawn.dart';
 import 'package:vector_math/vector_math_64.dart' as vm;
 
+class GameState {
+  GameState({
+    required this.player,
+  });
+
+  final KinematicPlayer player;
+  int coinsCollected = 0;
+}
+
 class GameWidget extends StatefulWidget {
   const GameWidget({super.key});
 
@@ -99,7 +108,7 @@ class _GameWidgetState extends State<GameWidget> {
 
   final InputActions inputActions = InputActions();
   final FollowCamera camera = FollowCamera();
-  KinematicPlayer? player;
+  GameState? gameState;
   SpawnController? spawnController;
 
   @override
@@ -131,8 +140,10 @@ class _GameWidgetState extends State<GameWidget> {
     setState(() {
       playingGame = true;
       resetTimer();
-      player = KinematicPlayer();
-      spawnController = SpawnController();
+      gameState = GameState(
+        player: KinematicPlayer(),
+      );
+      spawnController = SpawnController(gameState!);
     });
   }
 
@@ -140,7 +151,7 @@ class _GameWidgetState extends State<GameWidget> {
     setState(() {
       playingGame = false;
       resetTimer();
-      player = null;
+      gameState = null;
       spawnController = null;
     });
   }
@@ -154,13 +165,14 @@ class _GameWidgetState extends State<GameWidget> {
   Widget build(BuildContext context) {
     double secondsRemaining = math.max(0, kTimeLimit - time);
     if (playingGame) {
-      inputActions.updatePlayer(player!);
-      player!.update(deltaSeconds);
-      spawnController!.update(player!.position, deltaSeconds);
+      inputActions.updatePlayer(gameState!.player);
+      gameState!.player.update(deltaSeconds);
+      spawnController!.update(deltaSeconds);
       camera.updateGameplay(
-          player!.position,
-          vm.Vector3(player!.velocityXZ.x, 0, player!.velocityXZ.y) *
-              player!.kMaxSpeed,
+          gameState!.player.position,
+          vm.Vector3(gameState!.player.velocityXZ.x, 0,
+                  gameState!.player.velocityXZ.y) *
+              gameState!.player.kMaxSpeed,
           deltaSeconds);
 
       if (secondsRemaining <= 0) {
@@ -183,7 +195,7 @@ class _GameWidgetState extends State<GameWidget> {
           SceneBox(
             root: Node(children: [
               Node.asset("models/ground.glb"),
-              if (player != null) player!.node,
+              if (gameState != null) gameState!.player.node,
               Node.transform(
                 transform:
                     Matrix4.translation(camera.position) * Matrix4.rotationY(3),
@@ -202,8 +214,7 @@ class _GameWidgetState extends State<GameWidget> {
                 child: HUDBox(
                   child: HUDLabelText(
                     label: "💰 ",
-                    value:
-                        "${spawnController!.coins.where((coin) => coin.collected).length}",
+                    value: gameState!.coinsCollected.toString().padLeft(3, "0"),
                   ),
                 ),
               ),

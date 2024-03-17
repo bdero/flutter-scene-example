@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter_scene/scene.dart';
 import 'package:scene_demo/demo/coin.dart';
+import 'package:scene_demo/demo/game.dart';
+import 'package:scene_demo/demo/spike.dart';
 import 'package:vector_math/vector_math_64.dart' as vm;
 
 enum SpawnType {
@@ -12,8 +14,9 @@ enum SpawnType {
 abstract class SpawnPattern {
   /// Called when the pattern should update.
   ///
-  /// `update` should return false when it is done spawning.
-  /// If `update` returns true, then the pattern will continue receiving update calls.
+  /// `update` should return false when the spawn pattern has completed.
+  /// If `update` returns true, then the pattern will continue receiving update
+  /// calls.
   bool update(vm.Vector3 playerPosition, double deltaSeconds,
       Function(vm.Vector3 spawnPosition) spawnCallback);
 }
@@ -107,6 +110,10 @@ class SpawnRule {
 }
 
 class SpawnController {
+  SpawnController(this.gameState);
+
+  final GameState gameState;
+
   final List<SpawnRule> rules = [
     SpawnRule(
       spawnTime: 0,
@@ -126,7 +133,7 @@ class SpawnController {
         vm.Vector3(7 + 2 * 2, 1.5, -16.5 + 1.3 * 2),
         vm.Vector3(7 + 2 * 3, 1.5, -16 + 1.3 * 3),
       ]),
-      spawnType: SpawnType.eCoin,
+      spawnType: SpawnType.eSpike,
     ),
     SpawnRule(
       spawnTime: 5,
@@ -161,16 +168,17 @@ class SpawnController {
         minSpawnRate: 0.2,
         maxSpawnRate: 1.5,
       ),
-      spawnType: SpawnType.eCoin,
+      spawnType: SpawnType.eSpike,
     ),
   ];
   final List<SpawnPattern> activePatterns = [];
   final List<Coin> coins = [];
+  final List<Spike> spikes = [];
 
   int nextRuleIndex = 0;
   double timeElapsed = 0;
 
-  void update(vm.Vector3 playerPosition, double deltaSeconds) {
+  void update(double deltaSeconds) {
     timeElapsed += deltaSeconds;
 
     while (nextRuleIndex < rules.length &&
@@ -182,10 +190,12 @@ class SpawnController {
 
     for (int i = activePatterns.length - 1; i >= 0; i--) {
       SpawnPattern pattern = activePatterns[i];
-      final updateResult =
-          pattern.update(playerPosition, deltaSeconds, (vm.Vector3 position) {
+      final updateResult = pattern.update(
+          gameState.player.position, deltaSeconds, (vm.Vector3 position) {
         if (rules[i].spawnType == SpawnType.eCoin) {
-          coins.add(Coin(position));
+          coins.add(Coin(gameState, position));
+        } else if (rules[i].spawnType == SpawnType.eSpike) {
+          spikes.add(Spike(gameState, position));
         }
       });
       if (!updateResult) {
@@ -193,14 +203,26 @@ class SpawnController {
       }
     }
 
-    for (var coin in coins) {
-      coin.update(playerPosition, deltaSeconds);
+    for (int i = coins.length - 1; i >= 0; i--) {
+      Coin coin = coins[i];
+      if (!coin.update(deltaSeconds)) {
+        coins.removeAt(i);
+      }
+    }
+    for (int i = spikes.length - 1; i >= 0; i--) {
+      Spike spike = spikes[i];
+      if (!spike.update(deltaSeconds)) {
+        spikes.removeAt(i);
+      }
     }
   }
 
   Node get node {
     return Node(
-      children: coins.map((coin) => coin.node).toList(growable: false),
+      children: [
+        for (var coin in coins) coin.node,
+        for (var spike in spikes) spike.node,
+      ],
     );
   }
 }
