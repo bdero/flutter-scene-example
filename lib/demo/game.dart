@@ -147,6 +147,15 @@ enum GameMode {
   leaderboardEntry,
 }
 
+class SpringCurve extends Curve {
+  @override
+  double transformInternal(double t) {
+    const a = 0.09;
+    const w = 20;
+    return -(math.pow(math.e, -t / a) * math.cos(t * w)) + 1.0;
+  }
+}
+
 class _GameWidgetState extends State<GameWidget> {
   GameMode gameMode = GameMode.startMenu;
 
@@ -226,7 +235,6 @@ class _GameWidgetState extends State<GameWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print(Directory.current.path);
     if (gameMode == GameMode.playing) {
       // If the game is playing, update the player and camera.
       double secondsRemaining = math.max(0, GameState.kTimeLimit - time);
@@ -276,23 +284,41 @@ class _GameWidgetState extends State<GameWidget> {
         if (gameMode == GameMode.playing)
           GameplayHUD(gameState: gameState!, time: time),
         if (gameMode == GameMode.startMenu)
-          Animate(
-            child: const Center(
-              child: HUDBox(
-                child: Text(
-                  "Press any button to start",
-                  style: TextStyle(
-                    fontSize: 40,
-                    fontWeight: FontWeight.bold,
+          Center(
+              child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Column(
+                children: [
+                  HUDBox(
+                    child: Text(
+                      "Press any button to start",
+                      style: TextStyle(
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ),
-          )
-              .animate()
-              .fade()
-              .slide(duration: 1.5.seconds, curve: Curves.bounceOut)
-              .flip(),
+                  SizedBox(height: 20),
+                  HUDBox(
+                    child: Text(
+                      "🕹️ Left stick to move, 🅰️ to jump",
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                    ),
+                  )
+                ],
+              )
+                  .animate(key: const ValueKey("startMenu"))
+                  .fade(duration: 0.2.seconds)
+                  .slide(duration: 1.5.seconds, curve: SpringCurve())
+                  .flip(),
+              const SizedBox(height: 50),
+              LeaderboardWidget()
+            ],
+          )),
         if (gameMode == GameMode.leaderboardEntry)
           Center(
             child: LeaderboardForm(
@@ -300,7 +326,11 @@ class _GameWidgetState extends State<GameWidget> {
                 onSubmit: () {
                   gotoStartMenu();
                 }),
-          ),
+          )
+              .animate(key: const ValueKey("leaderboard"))
+              .fade(duration: 0.2.seconds)
+              .slide(duration: 1.5.seconds, curve: SpringCurve())
+              .flip(),
       ],
     );
   }

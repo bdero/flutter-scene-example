@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:scene_demo/demo/game.dart';
 
@@ -83,35 +84,106 @@ class LeaderboardForm extends StatefulWidget {
 class _LeaderboardFormState extends State<LeaderboardForm> {
   final _nameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  late FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+    _focusNode.requestFocus();
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return HUDBox(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 40),
-        width: 440,
-        height: 250,
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+        width: 460,
         child: Form(
           key: _formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('You collected ${widget.score} coins!'),
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Name'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a name!';
-                  }
-                  return null;
-                },
-              ),
+              Text(
+                  'You collected ${widget.score} coin${widget.score != 1 ? 's' : ''}!'),
               const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                decoration: BoxDecoration(
+                  color: Colors.white.withAlpha(50),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.white.withAlpha(150),
+                        blurRadius: 5,
+                        offset: Offset.zero,
+                        blurStyle: BlurStyle.outer),
+                  ],
+                ),
+                child: TextFormField(
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    shadows: [
+                      Shadow(
+                        blurRadius: 6,
+                        color: Colors.black,
+                        offset: Offset(1, 1),
+                      ),
+                    ],
+                    fontFamily: 'monospace',
+                    fontFamilyFallback: ['Courier'],
+                  ),
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Type your name here!',
+                    //border: InputBorder.none,
+                    border: UnderlineInputBorder(),
+                  ),
+                  maxLength: 18,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a name!';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              const SizedBox(height: 30),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      widget.onSubmit();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.pink.withAlpha(150),
+                    ),
+                    child: const Text(
+                      '⏎ Cancel',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        shadows: [
+                          Shadow(
+                            blurRadius: 4,
+                            color: Colors.black,
+                            offset: Offset(2, 2),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
@@ -122,18 +194,135 @@ class _LeaderboardFormState extends State<LeaderboardForm> {
                         widget.onSubmit();
                       }
                     },
-                    child: const Text('Submit'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      widget.onSubmit();
-                    },
-
-                    child: const Text('Back to start screen'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Color.fromARGB(255, 57, 155, 60).withAlpha(150),
+                    ),
+                    child: const Text(
+                      '😎 Submit',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        shadows: [
+                          Shadow(
+                            blurRadius: 4,
+                            color: Colors.black,
+                            offset: Offset(2, 2),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A widget that displays the leaderboard.
+class LeaderboardWidget extends StatefulWidget {
+  LeaderboardWidget({Key? key}) : super(key: key);
+
+  @override
+  State<LeaderboardWidget> createState() => _LeaderboardWidgetState();
+}
+
+String getPlacementText(int index) {
+  final ones = index % 10;
+  switch (ones) {
+    case 1:
+      return '${index}st';
+    case 2:
+      return '${index}nd';
+    case 3:
+      return '${index}rd';
+    default:
+      return '${index}th';
+  }
+}
+
+class _LeaderboardWidgetState extends State<LeaderboardWidget> {
+  final Leaderboard _leaderboard = Leaderboard.loadLocal();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 250,
+      width: 540,
+      child: HUDBox(
+        child: ShaderMask(
+          shaderCallback: (bounds) {
+            return const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.purple,
+                Colors.transparent,
+                Colors.transparent,
+                Colors.purple
+              ],
+              stops: [0.0, 0.1, 0.9, 1.0],
+            ).createShader(bounds);
+          },
+          blendMode: BlendMode.dstOut,
+          child: ListView.builder(
+            itemCount: _leaderboard.entries.length,
+            itemBuilder: (context, index) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                      child: Text(
+                    getPlacementText(index + 1),
+                    style: const TextStyle(
+                      fontFamily: 'monospace',
+                      fontFamilyFallback: ['Courier'],
+                    ),
+                    overflow: TextOverflow.fade,
+                    softWrap: false,
+                  )),
+                  Expanded(
+                    flex: 3,
+                    child: Text(
+                      '${index == 0 ? '👑 ' : ''}${_leaderboard.entries[index].name}',
+                      style: const TextStyle(
+                        fontFamily: 'monospace',
+                        fontFamilyFallback: ['Courier'],
+                      ),
+                      overflow: TextOverflow.fade,
+                      softWrap: false,
+                    ),
+                  ),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        '💰${_leaderboard.entries[index].score.toString()}',
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontFamilyFallback: ['Courier'],
+                        ),
+                        overflow: TextOverflow.fade,
+                        softWrap: false,
+                      ),
+                    ),
+                  ),
+                ],
+              )
+                  .animate(key: ValueKey('leaderboardrows$index'))
+                  .fade(delay: (index * 0.1).seconds)
+                  .slideY(
+                    curve: Curves.easeOutCubic,
+                    duration: 1.5.seconds,
+                    begin: 10, 
+                    end: 0,
+                  );
+            },
           ),
         ),
       ),
