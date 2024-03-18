@@ -124,10 +124,21 @@ class KinematicPlayer {
     }
 
     // Begin jumping
-    if (requestJump && onGround && jumpCooldown == 0) {
+    if (requestJump &&
+        onGround &&
+        jumpCooldown == 0 &&
+        (_jumpState == JumpAnimationState.none || _jumpState == JumpAnimationState.landing)) {
       _velocityY = kJumpSpeed;
       jumpCooldown = 0.2;
       _jumpState = JumpAnimationState.jumping;
+    } else if (jumpCooldown > 0) {
+      // The user can hold the jump button for multiple frames to increase height.
+      jumpCooldown = math.max(0, jumpCooldown - deltaSeconds);
+      if (!requestJump || jumpCooldown == 0) {
+        jumpCooldown = 0;
+      } else {
+        _velocityY = kJumpSpeed;
+      }
     }
 
     // Jump animation state.
