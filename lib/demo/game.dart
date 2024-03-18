@@ -364,22 +364,23 @@ class _GameWidgetState extends State<GameWidget> {
                             end: Alignment.bottomCenter,
                             colors: const [
                               Color.fromARGB(255, 153, 221, 255),
-                              Color.fromARGB(255, 223, 177, 51),
-                              Color.fromARGB(255, 97, 216, 115),
+                              Color.fromARGB(255, 255, 158, 126),
+                              Color.fromARGB(255, 230, 229, 255),
+                              Color.fromARGB(255, 15, 234, 48),
                               Colors.white,
                             ],
-                            stops: const [0, 0.1, 0.9, 1],
+                            stops: const [0, 0.1,0.5, 0.9, 1],
                             tileMode: TileMode.repeated,
                             transform: SheenGradientTransform(
                               -math.pi / 4,
-                              vm.Vector3(time * 100, 0, 0),
+                              vm.Vector3(time * 150, 0, 0),
                               10,
                             )).createShader(bounds);
                       },
                       child: const Text(
-                        "Press any button to start",
+                        "PRESS 🅰️ TO PLAY!",
                         style: TextStyle(
-                          fontSize: 40,
+                          fontSize: 80,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -390,7 +391,7 @@ class _GameWidgetState extends State<GameWidget> {
                     child: Text(
                       "🕹️ Left stick to move, 🅰️ to jump",
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 30,
                       ),
                     ),
                   )
