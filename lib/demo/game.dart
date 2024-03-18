@@ -20,7 +20,7 @@ class GameState {
     required this.player,
   });
 
-  static const kTimeLimit = 5; // Seconds.
+  static const kTimeLimit = 60; // Seconds.
 
   final KinematicPlayer player;
   int coinsCollected = 0;

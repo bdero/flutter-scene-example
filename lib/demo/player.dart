@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter_scene/scene.dart';
+import 'package:scene_demo/demo/math_utils.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 enum JumpAnimationState {
@@ -54,6 +55,10 @@ class KinematicPlayer {
   JumpAnimationState _jumpState = JumpAnimationState.none;
   double landingAnimationCooldown = 0;
 
+  double groundedWeight = 1;
+  double jumpStartWeight = 0;
+  double landingWeight = 0;
+
   Node get node {
     if (damageCooldown % 0.2 > 0.12) {
       return Node();
@@ -66,13 +71,6 @@ class KinematicPlayer {
     double speed = _velocityXZ.length;
 
     Node characterModel = Node.asset("models/dash.glb");
-
-    double groundedWeight = (_jumpState == JumpAnimationState.none ? 1 : 0);
-    double jumpStartWeight = (_jumpState == JumpAnimationState.jumping ||
-            _jumpState == JumpAnimationState.falling)
-        ? 1
-        : 0;
-    double landingWeight = (_jumpState == JumpAnimationState.landing) ? 1 : 0;
 
     characterModel.setAnimationState("Walk", false, true, 0.0, 1.0);
     characterModel.setAnimationState(
@@ -139,13 +137,13 @@ class KinematicPlayer {
           _jumpState = JumpAnimationState.falling;
         } else if (onGround) {
           _jumpState = JumpAnimationState.landing;
-          landingAnimationCooldown = 0.3;
+          landingAnimationCooldown = 0.4;
         }
         break;
       case JumpAnimationState.falling:
         if (onGround) {
           _jumpState = JumpAnimationState.landing;
-          landingAnimationCooldown = 0.3;
+          landingAnimationCooldown = 0.4;
         }
         break;
       case JumpAnimationState.landing:
@@ -159,6 +157,18 @@ class KinematicPlayer {
       case JumpAnimationState.none:
         break;
     }
+
+    double groundedWeightDest = (_jumpState == JumpAnimationState.none ? 1 : 0);
+    double jumpStartWeightDest = (_jumpState == JumpAnimationState.jumping ||
+            _jumpState == JumpAnimationState.falling)
+        ? 1
+        : 0;
+    double landingWeightDest = (_jumpState == JumpAnimationState.landing) ? 1 : 0;
+
+    groundedWeight = math.max(groundedWeightDest,  math.min(1, 1 - landingAnimationCooldown * 6));
+    jumpStartWeight = jumpStartWeightDest;
+    landingWeight = landingWeightDest * math.min(1, landingAnimationCooldown * 4);
+    print ("groundedWeight: $groundedWeight, jumpStartWeight: $jumpStartWeight, landingWeight: $landingWeight");
 
     // Speed up when there's input.
     if (_inputDirection.length2 > 1e-3) {
