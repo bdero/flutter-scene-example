@@ -157,11 +157,11 @@ class SpringCurve extends Curve {
 }
 
 class SheenGradientTransform extends GradientTransform {
+  SheenGradientTransform(this.rotation, this.translation, this.scale);
+
   double rotation;
   vm.Vector3 translation;
   double scale;
-
-  SheenGradientTransform(this.rotation, this.translation, this.scale);
 
   @override
   Matrix4 transform(Rect bounds, {TextDirection? textDirection}) {
@@ -342,7 +342,7 @@ class _GameWidgetState extends State<GameWidget> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   const HUDBox(
                     child: Text(
                       "🕹️ Left stick to move, 🅰️ to jump",

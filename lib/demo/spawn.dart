@@ -133,7 +133,7 @@ class SpawnController {
         vm.Vector3(7 + 2 * 2, 1.5, -16.5 + 1.3 * 2),
         vm.Vector3(7 + 2 * 3, 1.5, -16 + 1.3 * 3),
       ]),
-      spawnType: SpawnType.eSpike,
+      spawnType: SpawnType.eCoin,
     ),
     SpawnRule(
       spawnTime: 5,

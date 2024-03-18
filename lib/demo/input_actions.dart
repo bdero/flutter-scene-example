@@ -62,8 +62,11 @@ class InputActions {
   bool absorbKeyEvents = false;
   Vector2 inputDirection = Vector2.zero();
 
+  bool jump = false;
+
   void updatePlayer(KinematicPlayer player) {
     player.inputDirection = inputDirection;
+    player.requestJump = jump;
   }
 
   bool _onKeyEvent(KeyEvent event) {
@@ -95,6 +98,8 @@ class InputActions {
               .toDouble(),
         );
 
+    jump = keyboardInputState[" "]! > 0;
+
     return absorbKeyEvents && keyboardInputState.containsKey(key);
   }
 
@@ -115,6 +120,11 @@ class InputActions {
           gamepadInputState["dpad - xAxis"]!,
           gamepadInputState["dpad - yAxis"]!,
         );
+
+    jump = gamepadInputState["a.circle"]! > 0 ||
+        gamepadInputState["b.circle"]! > 0 ||
+        gamepadInputState["x.circle"]! > 0 ||
+        gamepadInputState["y.circle"]! > 0;
   }
 
   Widget getControlWidget(BuildContext context, Widget child) {

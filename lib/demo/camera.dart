@@ -28,32 +28,17 @@ class FollowCamera {
     Vector3 destinationTarget =
         cameraTarget + Vector3(0, 2, 0) + movementDirection * 0.6;
 
-    if ((cameraTarget - kLogoArea).length < kLogoRadius) {
-      destinationPosition = kLogoArea + kLogoFollowOffset;
-      destinationTarget = vector3Lerp(destinationTarget, kLogoArea, 0.6);
-    }
-
-    if ((cameraTarget - kOverviewArea).length < kOverviewRadius) {
-      destinationPosition = kOverviewCameraPosition;
-      destinationTarget =
-          Vector3.zero(); //vector3Lerp(destinationTarget, Vector3.zero(), 0.8);
-
-      position = vector3LerpDeltaTime(
-          position, destinationPosition, 0.4, deltaSeconds);
-      target =
-          vector3LerpDeltaTime(target, destinationTarget, 0.4, deltaSeconds);
-    } else {
-      position = vector3LerpDeltaTime(
-          position, destinationPosition, 0.1, deltaSeconds);
-      target =
-          vector3LerpDeltaTime(target, destinationTarget, 0.1, deltaSeconds);
-    }
+    position =
+        vector3LerpDeltaTime(position, destinationPosition, 0.1, deltaSeconds);
+    target = vector3LerpDeltaTime(target, destinationTarget, 0.1, deltaSeconds);
   }
 
   void updateOverview(double deltaSeconds, double timeElapsed) {
     position = vector3LerpDeltaTime(
         position,
-        Vector3(math.sin(timeElapsed/5) * 7, 5, -math.cos(timeElapsed/5) * 7) * 6,
+        Vector3(math.sin(timeElapsed / 5) * 7, 5,
+                -math.cos(timeElapsed / 5) * 7) *
+            6,
         0.6,
         deltaSeconds);
     target = vector3LerpDeltaTime(target, Vector3.zero(), 0.4, deltaSeconds);
