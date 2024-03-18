@@ -21,7 +21,7 @@ class GameState {
     required this.player,
   });
 
-  static const kTimeLimit = 60; // Seconds.
+  static const kTimeLimit = 150; // Seconds.
 
   final KinematicPlayer player;
   int coinsCollected = 0;
@@ -391,7 +391,7 @@ class _GameWidgetState extends State<GameWidget> {
                     child: Text(
                       "🕹️ Left stick to move, 🅰️ to jump",
                       style: TextStyle(
-                        fontSize: 30,
+                        fontSize: 34,
                       ),
                     ),
                   )

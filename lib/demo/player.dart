@@ -127,7 +127,8 @@ class KinematicPlayer {
     if (requestJump &&
         onGround &&
         jumpCooldown == 0 &&
-        (_jumpState == JumpAnimationState.none || _jumpState == JumpAnimationState.landing)) {
+        (_jumpState == JumpAnimationState.none ||
+            _jumpState == JumpAnimationState.landing)) {
       _velocityY = kJumpSpeed;
       jumpCooldown = 0.2;
       _jumpState = JumpAnimationState.jumping;

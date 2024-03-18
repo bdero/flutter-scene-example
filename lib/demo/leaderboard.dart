@@ -106,15 +106,44 @@ class _LeaderboardFormState extends State<LeaderboardForm> {
     return HUDBox(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
-        width: 460,
+        width: 470,
         child: Form(
           key: _formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                  'You collected ${widget.score} coin${widget.score != 1 ? 's' : ''}!'),
+              RichText(
+                text: TextSpan(
+                  text: 'You collected ',
+                  style: const TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.normal,
+                    shadows: [
+                      Shadow(
+                        blurRadius: 6,
+                        color: Colors.black,
+                        offset: Offset(2, 2),
+                      ),
+                    ],
+                    overflow: TextOverflow.fade,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: widget.score.toString(),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: ' coin${widget.score != 1 ? 's' : ''}! 🤑',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 20),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20),

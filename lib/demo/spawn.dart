@@ -7,8 +7,8 @@ import 'package:scene_demo/demo/spike.dart';
 import 'package:vector_math/vector_math_64.dart' as vm;
 
 enum SpawnType {
-  eCoin,
-  eSpike,
+  coin,
+  spike,
 }
 
 abstract class SpawnPattern {
@@ -133,7 +133,7 @@ class SpawnController {
         vm.Vector3(7 + 2 * 2, 1.5, -16.5 + 1.3 * 2),
         vm.Vector3(7 + 2 * 3, 1.5, -16 + 1.3 * 3),
       ]),
-      spawnType: SpawnType.eCoin,
+      spawnType: SpawnType.coin,
     ),
     SpawnRule(
       spawnTime: 5,
@@ -141,7 +141,7 @@ class SpawnController {
         radius: 3,
         count: 8,
       ),
-      spawnType: SpawnType.eCoin,
+      spawnType: SpawnType.coin,
     ),
     SpawnRule(
       spawnTime: 5,
@@ -149,29 +149,211 @@ class SpawnController {
         radius: 5,
         count: 10,
       ),
-      spawnType: SpawnType.eCoin,
-    ),
-    SpawnRule(
-      spawnTime: 5,
-      pattern: PlayerCircleSpawnPattern(
-        radius: 7,
-        count: 12,
-      ),
-      spawnType: SpawnType.eCoin,
+      spawnType: SpawnType.coin,
     ),
     SpawnRule(
       spawnTime: 5,
       pattern: RandomNearPlayerSpawnPattern(
-        lifetime: 10,
+        lifetime: 60,
         minDistance: 3,
         maxDistance: 8,
         minSpawnRate: 0.2,
+        maxSpawnRate: 1.0,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+    SpawnRule(
+      spawnTime: 8,
+      pattern: RandomNearPlayerSpawnPattern(
+        lifetime: 60,
+        minDistance: 5,
+        maxDistance: 10,
+        minSpawnRate: 0.5,
         maxSpawnRate: 1.5,
       ),
-      spawnType: SpawnType.eSpike,
+      spawnType: SpawnType.spike,
+    ),
+    SpawnRule(
+      spawnTime: 10,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 3,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+    SpawnRule(
+      spawnTime: 20,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 3,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+    SpawnRule(
+      spawnTime: 30,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 3,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+
+    // Cluster
+    SpawnRule(
+      spawnTime: 31,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 8,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+    SpawnRule(
+      spawnTime: 31.5,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 7,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+    SpawnRule(
+      spawnTime: 32,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 6,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+    SpawnRule(
+      spawnTime: 32.5,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 6,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+    SpawnRule(
+      spawnTime: 33,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 5,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+    SpawnRule(
+      spawnTime: 33.5,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 4,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+    SpawnRule(
+      spawnTime: 34,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 3,
+        count: 8,
+      ),
+      spawnType: SpawnType.spike,
+    ),
+
+    SpawnRule(
+      spawnTime: 40,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 3,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+    SpawnRule(
+      spawnTime: 50,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 3,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+    SpawnRule(
+      spawnTime: 60,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 3,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+    SpawnRule(
+      spawnTime: 70,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 3,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+    SpawnRule(
+      spawnTime: 80,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 3,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+    SpawnRule(
+      spawnTime: 90,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 3,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+    SpawnRule(
+      spawnTime: 100,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 3,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+    SpawnRule(
+      spawnTime: 110,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 3,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+    SpawnRule(
+      spawnTime: 120,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 3,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+    SpawnRule(
+      spawnTime: 130,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 3,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+    SpawnRule(
+      spawnTime: 140,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 3,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
+    ),
+    SpawnRule(
+      spawnTime: 145,
+      pattern: PlayerCircleSpawnPattern(
+        radius: 3,
+        count: 8,
+      ),
+      spawnType: SpawnType.coin,
     ),
   ];
-  final List<SpawnPattern> activePatterns = [];
+  final List<SpawnRule> activeRules = [];
 
   int nextRuleIndex = 0;
   double timeElapsed = 0;
@@ -182,22 +364,22 @@ class SpawnController {
     while (nextRuleIndex < rules.length &&
         timeElapsed > rules[nextRuleIndex].spawnTime) {
       SpawnRule rule = rules[nextRuleIndex];
-      activePatterns.add(rule.pattern);
+      activeRules.add(rule);
       nextRuleIndex++;
     }
 
-    for (int i = activePatterns.length - 1; i >= 0; i--) {
-      SpawnPattern pattern = activePatterns[i];
-      final updateResult = pattern.update(
+    for (int i = activeRules.length - 1; i >= 0; i--) {
+      SpawnRule rule = activeRules[i];
+      final updateResult = rule.pattern.update(
           gameState.player.position, deltaSeconds, (vm.Vector3 position) {
-        if (rules[i].spawnType == SpawnType.eCoin) {
+        if (rule.spawnType == SpawnType.coin) {
           gameState.coins.add(Coin(gameState, position, vm.Vector3(0, 12, 0)));
-        } else if (rules[i].spawnType == SpawnType.eSpike) {
+        } else if (rule.spawnType == SpawnType.spike) {
           gameState.spikes.add(Spike(gameState, position));
         }
       });
       if (!updateResult) {
-        activePatterns.removeAt(i);
+        activeRules.removeAt(i);
       }
     }
 

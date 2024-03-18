@@ -23,6 +23,8 @@ class Spike {
 
   bool destroyed = false;
 
+  double lifetime = 4;
+
   Node get node {
     return Node.transform(
       transform: Matrix4.translation(position) *
@@ -39,6 +41,11 @@ class Spike {
   /// Returns true if the spike is still active and should continue being
   /// updated.
   bool update(double deltaSeconds) {
+    lifetime -= deltaSeconds;
+    if (lifetime < 0) {
+      destroyed = true;
+      startDestroyPosition = position;
+    }
     if (destroyAnimation == 1) {
       return false;
     }

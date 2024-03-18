@@ -17,12 +17,17 @@ class Coin {
   double rotation = 0;
   bool collected = false;
 
+  double lifetime = 8;
+
   double scale = 0;
 
   Vector3 startCollectionPosition = Vector3.zero();
   double collectAnimation = 0;
 
   Node get node {
+    if (lifetime < 3 && lifetime % 0.2 > 0.12) {
+      return Node();
+    }
     return Node.transform(
       transform: Matrix4.translation(position) *
           Matrix4.rotationY(rotation) *
@@ -38,6 +43,11 @@ class Coin {
   /// Returns true if the coin is still active and should continue being
   /// updated.
   bool update(double deltaSeconds) {
+    lifetime -= deltaSeconds;
+    if (lifetime < 0) {
+      return false;
+    }
+
     if (collected && collectAnimation == 1) {
       return false;
     }
