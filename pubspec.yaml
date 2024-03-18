@@ -17,6 +17,7 @@ dependencies:
   gamepads: ^0.1.1
   json_annotation: ^4.8.1
   flutter_animate: ^4.5.0
+  flutter_soloud: ^1.2.5
 
 dev_dependencies:
   flutter_test:
@@ -31,6 +32,8 @@ flutter:
 
   assets:
     - assets/dash.png
+    - assets/potion.ogg
+    - assets/machine.ogg
 
   models:
     - models/sky_sphere.glb

@@ -163,12 +163,14 @@ class KinematicPlayer {
             _jumpState == JumpAnimationState.falling)
         ? 1
         : 0;
-    double landingWeightDest = (_jumpState == JumpAnimationState.landing) ? 1 : 0;
+    double landingWeightDest =
+        (_jumpState == JumpAnimationState.landing) ? 1 : 0;
 
-    groundedWeight = math.max(groundedWeightDest,  math.min(1, 1 - landingAnimationCooldown * 6));
+    groundedWeight = math.max(
+        groundedWeightDest, math.min(1, 1 - landingAnimationCooldown * 6));
     jumpStartWeight = jumpStartWeightDest;
-    landingWeight = landingWeightDest * math.min(1, landingAnimationCooldown * 4);
-    print ("groundedWeight: $groundedWeight, jumpStartWeight: $jumpStartWeight, landingWeight: $landingWeight");
+    landingWeight =
+        landingWeightDest * math.min(1, landingAnimationCooldown * 4);
 
     // Speed up when there's input.
     if (_inputDirection.length2 > 1e-3) {

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_scene/scene.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:scene_demo/demo/camera.dart';
 import 'package:scene_demo/demo/coin.dart';
 import 'package:scene_demo/demo/leaderboard.dart';
@@ -185,6 +186,10 @@ class _GameWidgetState extends State<GameWidget> {
 
   int lastScore = 0;
 
+  SoundProps? frontendMusic;
+  SoundProps? gameplayMusic;
+  int? currentMusicHandle;
+
   @override
   void initState() {
     tick = Ticker(
@@ -200,7 +205,43 @@ class _GameWidgetState extends State<GameWidget> {
 
     gotoStartMenu();
 
+    SoloudTools.loadFromAssets("assets/potion.ogg").then((sound) {
+      frontendMusic = sound;
+      playMusic(frontendMusic, true, true);
+    });
+    SoloudTools.loadFromAssets("assets/machine.ogg").then((sound) {
+      gameplayMusic = sound;
+      print("got sound");
+    });
+
     super.initState();
+  }
+
+  void playMusic(SoundProps? music, bool loop, bool fadeIn) {
+    if (currentMusicHandle != null) {
+      SoLoud().stop(currentMusicHandle!);
+    }
+    if (music != null) {
+      SoLoud().play(music, volume: 0.0).then((value) {
+        if (value.error != PlayerErrors.noError) {
+          debugPrint('SoLoud error: ${value.error}');
+        }
+        currentMusicHandle = value.newHandle;
+        if (loop) {
+          final loopingResult = SoLoud().setLooping(value.newHandle, true);
+          if (loopingResult != PlayerErrors.noError) {
+            debugPrint('SoLoud error: $value');
+          }
+        }
+        if (fadeIn) {
+          final fadeVolumeResult =
+              SoLoud().fadeVolume(value.newHandle, 0.5, 0.5);
+          if (fadeVolumeResult != PlayerErrors.noError) {
+            debugPrint('SoLoud error: $value');
+          }
+        }
+      });
+    }
   }
 
   void resetTimer() {
@@ -220,6 +261,7 @@ class _GameWidgetState extends State<GameWidget> {
         player: KinematicPlayer(),
       );
       spawnController = SpawnController(gameState!);
+      playMusic(gameplayMusic, false, true);
     });
   }
 
@@ -240,6 +282,7 @@ class _GameWidgetState extends State<GameWidget> {
       lastScore = gameState!.coinsCollected;
       gameState = null;
       spawnController = null;
+      playMusic(frontendMusic, true, true);
     });
   }
 

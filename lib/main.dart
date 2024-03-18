@@ -5,9 +5,17 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:scene_demo/demo/game.dart';
 
-void main() {
+void main() async {
+  final value = await SoLoud().startIsolate();
+  if (value == PlayerErrors.noError) {
+    debugPrint('SoLoud isolate started');
+  } else {
+    debugPrint('SoLoud isolate error: $value');
+  }
+
   runApp(const DemoApp());
 }
 
