@@ -235,7 +235,7 @@ class _GameWidgetState extends State<GameWidget> {
         }
         if (fadeIn) {
           final fadeVolumeResult =
-              SoLoud().fadeVolume(value.newHandle, 0.5, 0.5);
+              SoLoud().fadeVolume(value.newHandle, 1, 0.5);
           if (fadeVolumeResult != PlayerErrors.noError) {
             debugPrint('SoLoud error: $value');
           }
