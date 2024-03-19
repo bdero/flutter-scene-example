@@ -21,7 +21,7 @@ class GameState {
     required this.player,
   });
 
-  static const kTimeLimit = 150; // Seconds.
+  static const kTimeLimit = 60; // Seconds.
 
   final KinematicPlayer player;
   int coinsCollected = 0;
@@ -369,7 +369,7 @@ class _GameWidgetState extends State<GameWidget> {
                               Color.fromARGB(255, 15, 234, 48),
                               Colors.white,
                             ],
-                            stops: const [0, 0.1,0.5, 0.9, 1],
+                            stops: const [0, 0.1, 0.5, 0.9, 1],
                             tileMode: TileMode.repeated,
                             transform: SheenGradientTransform(
                               -math.pi / 4,
@@ -408,10 +408,11 @@ class _GameWidgetState extends State<GameWidget> {
         if (gameMode == GameMode.leaderboardEntry)
           Center(
             child: LeaderboardForm(
-                score: lastScore,
-                onSubmit: () {
-                  gotoStartMenu();
-                }),
+              score: lastScore,
+              onSubmit: () {
+                gotoStartMenu();
+              },
+            ),
           )
               .animate(key: const ValueKey("leaderboard"))
               .fade(duration: 0.2.seconds)

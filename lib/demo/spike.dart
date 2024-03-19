@@ -84,7 +84,8 @@ class Spike {
       rotation += deltaSeconds * 10;
     }
 
-    scale = lerpDeltaTime(scale, 1, 0.1, deltaSeconds);
+    scale = lerpDeltaTime(scale, 1, 0.02, deltaSeconds);
+    rotation += deltaSeconds * 2;
 
     return true;
   }

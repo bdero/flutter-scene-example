@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -64,11 +65,20 @@ class Leaderboard {
     print('Adding entry: ${entry.name} - ${entry.score}');
     entries.add(entry);
     entries.sort((a, b) => b.score.compareTo(a.score));
-    if (entries.length > 10) {
-      entries.removeRange(10, entries.length);
-    }
+    //if (entries.length > 10) {
+    //  entries.removeRange(10, entries.length);
+    //}
     saveLocal();
   }
+}
+
+int getLeaderboardPlacement(int score, Leaderboard leaderboard) {
+  for (int i = 0; i < leaderboard.entries.length; i++) {
+    if (score > leaderboard.entries[i].score) {
+      return i + 1;
+    }
+  }
+  return leaderboard.entries.length + 1;
 }
 
 /// A widget that displays the leaderboard entry form.
@@ -88,6 +98,8 @@ class _LeaderboardFormState extends State<LeaderboardForm> {
   final _formKey = GlobalKey<FormState>();
   late FocusNode _focusNode;
 
+  final Leaderboard readOnlyLeaderboard = Leaderboard.loadLocal();
+
   @override
   void initState() {
     super.initState();
@@ -105,14 +117,42 @@ class _LeaderboardFormState extends State<LeaderboardForm> {
   Widget build(BuildContext context) {
     return HUDBox(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
-        width: 470,
+        padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 0),
+        width: 590,
         child: Form(
           key: _formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
+              RichText(
+                text: TextSpan(
+                  text:
+                      '🏆 ${getPlacementText(getLeaderboardPlacement(widget.score, readOnlyLeaderboard))}',
+                  style: const TextStyle(
+                    fontSize: 60,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 255, 255, 174),
+                    shadows: [
+                      Shadow(
+                        blurRadius: 6,
+                        color: Colors.black,
+                        offset: Offset(2, 2),
+                      ),
+                    ],
+                    overflow: TextOverflow.fade,
+                  ),
+                  children: const [
+                    TextSpan(
+                      text: ' place 🏆',
+                      style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
               RichText(
                 text: TextSpan(
                   text: 'You collected ',
@@ -132,7 +172,10 @@ class _LeaderboardFormState extends State<LeaderboardForm> {
                     TextSpan(
                       text: widget.score.toString(),
                       style: const TextStyle(
+                        fontSize: 30,
+                        decoration: TextDecoration.underline,
                         fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 154, 255, 218),
                       ),
                     ),
                     TextSpan(
@@ -144,8 +187,9 @@ class _LeaderboardFormState extends State<LeaderboardForm> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               Container(
+                width: 380,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 decoration: BoxDecoration(
                   color: Colors.white.withAlpha(50),
@@ -189,63 +233,76 @@ class _LeaderboardFormState extends State<LeaderboardForm> {
                 ),
               ),
               const SizedBox(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      widget.onSubmit();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.pink.withAlpha(150),
-                    ),
-                    child: const Text(
-                      '⏎ Cancel',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        shadows: [
-                          Shadow(
-                            blurRadius: 4,
-                            color: Colors.black,
-                            offset: Offset(2, 2),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        final name = _nameController.text;
-                        final leaderboard = Leaderboard.loadLocal();
-                        leaderboard
-                            .addEntry(LeaderboardEntry(name, widget.score));
+              SizedBox(
+                width: 440,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
                         widget.onSubmit();
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          Color.fromARGB(255, 57, 155, 60).withAlpha(150),
-                    ),
-                    child: const Text(
-                      '😎 Submit',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        shadows: [
-                          Shadow(
-                            blurRadius: 4,
-                            color: Colors.black,
-                            offset: Offset(2, 2),
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.pink.withAlpha(130),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(22)),
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        child: Text(
+                          '⏎ Cancel',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            shadows: [
+                              Shadow(
+                                blurRadius: 4,
+                                color: Colors.black,
+                                offset: Offset(2, 2),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          final name = _nameController.text;
+                          final leaderboard = Leaderboard.loadLocal();
+                          leaderboard
+                              .addEntry(LeaderboardEntry(name, widget.score));
+                          widget.onSubmit();
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 57, 155, 60)
+                            .withAlpha(150),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(22)),
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        child: Text(
+                          '😎 Submit',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            shadows: [
+                              Shadow(
+                                blurRadius: 4,
+                                color: Colors.black,
+                                offset: Offset(2, 2),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -264,17 +321,19 @@ class LeaderboardWidget extends StatefulWidget {
 }
 
 String getPlacementText(int index) {
-  final ones = index % 10;
-  switch (ones) {
-    case 1:
-      return '${index}st';
-    case 2:
-      return '${index}nd';
-    case 3:
-      return '${index}rd';
-    default:
-      return '${index}th';
+  final int ones = index % 10;
+  final int tens = (index ~/ 10) % 10;
+  if (tens != 1) {
+    switch (ones) {
+      case 1:
+        return '${index}st';
+      case 2:
+        return '${index}nd';
+      case 3:
+        return '${index}rd';
+    }
   }
+  return '${index}th';
 }
 
 enum LeaderboardState {
@@ -423,10 +482,12 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
                   ),
                 ],
               ).animate(key: ValueKey('leaderboardrows$index')).slideY(
-                    delay: (math.min(5, index) * 0.2).seconds,
+                    delay: index < 5
+                        ? (math.min(5, index) * 0.2).seconds
+                        : 0.seconds,
                     curve: Curves.easeOutCubic,
                     duration: 0.8.seconds,
-                    begin: 10,
+                    begin: index < 5 ? 10 : 0,
                     end: 0,
                   );
             },
