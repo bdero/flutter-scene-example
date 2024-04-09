@@ -1,29 +1,29 @@
 PODS:
-  - arkit_plugin (0.0.1):
-    - Flutter
-    - GLTFSceneKit
   - Flutter (1.0.0)
-  - GLTFSceneKit (0.3.0)
+  - flutter_soloud (0.0.1):
+    - Flutter
+  - path_provider_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
 
 DEPENDENCIES:
-  - arkit_plugin (from `.symlinks/plugins/arkit_plugin/ios`)
   - Flutter (from `Flutter`)
-
-SPEC REPOS:
-  trunk:
-    - GLTFSceneKit
+  - flutter_soloud (from `.symlinks/plugins/flutter_soloud/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
 
 EXTERNAL SOURCES:
-  arkit_plugin:
-    :path: ".symlinks/plugins/arkit_plugin/ios"
   Flutter:
     :path: Flutter
+  flutter_soloud:
+    :path: ".symlinks/plugins/flutter_soloud/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
 
 SPEC CHECKSUMS:
-  arkit_plugin: bb56e71ef215147316ecf3774d5cb74beda20a10
-  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
-  GLTFSceneKit: d1b437c514ba2aed5555afb0fddd64e030612d57
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  flutter_soloud: a49590bf8d8be2c55b50f4d4e819b764901a4946
+  path_provider_foundation: 3784922295ac71e43754bd15e0653ccfd36a147c
 
-PODFILE CHECKSUM: 70d9d25280d0dd177a5f637cdb0f0b0b12c6a189
+PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.15.2
