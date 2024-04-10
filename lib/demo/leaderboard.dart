@@ -41,8 +41,10 @@ class Leaderboard {
       final file = File('leaderboard.json');
       if (file.existsSync()) {
         final json = file.readAsStringSync();
-        print('Loaded leaderboard from ${file.path}');
+        print('Loaded leaderboard from ${file.absolute.path}');
         return Leaderboard.fromJson(jsonDecode(json));
+      } else {
+        print('No leaderboard file found at ${file.absolute.path}');
       }
     } catch (e) {
       print('Error loading leaderboard: $e');
@@ -55,7 +57,7 @@ class Leaderboard {
     try {
       final file = File('leaderboard.json');
       file.writeAsStringSync(jsonEncode(toJson()));
-      print('Leaderboard saved to ${file.path}');
+      print('Leaderboard saved to ${file.absolute.path}');
     } catch (e) {
       print('Error saving leaderboard: $e');
     }
