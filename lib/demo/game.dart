@@ -3,7 +3,9 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_scene/scene.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
@@ -250,6 +252,32 @@ class ImpellerLogo extends CustomPainter {
   }
 }
 
+class VignettePainter extends CustomPainter {
+  VignettePainter({this.color = Colors.white});
+
+  ui.Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint paint = Paint()
+      ..shader = RadialGradient(
+        radius: 1.0,
+        colors: [Colors.transparent, color],
+        stops: [0.2, 1.0],
+      ).createShader(
+        Rect.fromLTRB(0, 0, size.width, size.height),
+      )
+      ..blendMode = BlendMode.srcOver;
+
+    canvas.drawRect(Rect.fromLTRB(0, 0, size.width, size.height), paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
 class _GameWidgetState extends State<GameWidget> {
   GameMode gameMode = GameMode.startMenu;
 
@@ -257,6 +285,7 @@ class _GameWidgetState extends State<GameWidget> {
   double time = 0;
   double logoAnimation = 0;
   double deltaSeconds = 0;
+  double rainbowVignette = 1;
 
   final InputActions inputActions = InputActions();
   final FollowCamera camera = FollowCamera();
@@ -372,6 +401,10 @@ class _GameWidgetState extends State<GameWidget> {
 
   @override
   Widget build(BuildContext context) {
+    double rainbowVignetteDest = gameMode == GameMode.playing ? 0 : 1;
+    rainbowVignette =
+        lerpDeltaTime(rainbowVignette, rainbowVignetteDest, 0.8, deltaSeconds);
+
     if (gameMode == GameMode.playing) {
       // If the game is playing, update the player and camera.
       double secondsRemaining = math.max(0, GameState.kTimeLimit - time);
@@ -416,6 +449,50 @@ class _GameWidgetState extends State<GameWidget> {
               if (gameMode == GameMode.playing) spawnController!.node,
             ]),
             camera: camera.camera,
+          ),
+        ),
+        if (gameMode == GameMode.playing)
+          IgnorePointer(
+            child: CustomPaint(
+              painter: VignettePainter(
+                  color: Color.lerp(
+                          Colors.white.withAlpha(100),
+                          Colors.red,
+                          math.max(
+                              0.0, gameState!.player.damageCooldown - 1)) ??
+                      Colors.transparent),
+              child: Container(),
+            ),
+          ),
+        IgnorePointer(
+          child: Opacity(
+            opacity: rainbowVignette,
+            child: ShaderMask(
+              shaderCallback: (bounds) {
+                return LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: const [
+                      Color.fromARGB(255, 153, 221, 255),
+                      Color.fromARGB(255, 255, 158, 126),
+                      Color.fromARGB(255, 230, 229, 255),
+                      ui.Color.fromARGB(255, 114, 207, 131),
+                      Colors.white,
+                      Color.fromARGB(255, 153, 221, 255),
+                    ],
+                    stops: const [0, 0.1, 0.5, 0.8, 0.9, 1],
+                    tileMode: TileMode.repeated,
+                    transform: SheenGradientTransform(
+                      math.pi / 4,
+                      vm.Vector3(-time * 150, 0, 0),
+                      5,
+                    )).createShader(bounds);
+              },
+              child: CustomPaint(
+                painter: VignettePainter(),
+                child: Container(),
+              ),
+            ),
           ),
         ),
         if (gameMode == GameMode.playing)
@@ -497,48 +574,50 @@ class _GameWidgetState extends State<GameWidget> {
               .fade(duration: 0.2.seconds)
               .slide(duration: 1.5.seconds, curve: SpringCurve())
               .flip(),
-        IgnorePointer(
-          child: Opacity(
-            opacity: math.max(0, math.min(1, 2 - logoAnimation)),
-            child: Container(
-              color: Colors.black.withOpacity(1.0),
-              child: Center(
-                child: ImageFiltered(
-                  imageFilter: ui.ImageFilter.blur(
-                      sigmaX: lerp(0.0, 100.0, 1 / (1 + logoAnimation * 70))
-                              .toDouble() +
-                          math
-                              .max(0.0, (-1.0 + logoAnimation) * 40)
-                              .toDouble(),
-                      sigmaY: lerp(0.0, 100.0, 1 / (1 + logoAnimation * 70))
-                              .toDouble() +
-                          math
-                              .max(0.0, (-1.0 + logoAnimation) * 40)
-                              .toDouble(),
-                      tileMode: TileMode.decal),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ColorFiltered(
-                        colorFilter: const ui.ColorFilter.mode(
-                            Colors.white, BlendMode.srcATop),
-                        child: FlutterLogo(
-                          duration: Duration.zero,
-                          size: lerp(200, 600, 1 / (1 + logoAnimation * 10)),
+        if (logoAnimation < 2)
+          IgnorePointer(
+            child: Opacity(
+              opacity: math.max(0, math.min(1, 2 - logoAnimation)),
+              child: Container(
+                color: Colors.black.withOpacity(1.0),
+                child: Center(
+                  child: ImageFiltered(
+                    imageFilter: ui.ImageFilter.blur(
+                        sigmaX: lerp(0.0, 100.0, 1 / (1 + logoAnimation * 70))
+                                .toDouble() +
+                            math
+                                .max(0.0, (-1.0 + logoAnimation) * 40)
+                                .toDouble(),
+                        sigmaY: lerp(0.0, 100.0, 1 / (1 + logoAnimation * 70))
+                                .toDouble() +
+                            math
+                                .max(0.0, (-1.0 + logoAnimation) * 40)
+                                .toDouble(),
+                        tileMode: TileMode.decal),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ColorFiltered(
+                          colorFilter: const ui.ColorFilter.mode(
+                              Colors.white, BlendMode.srcATop),
+                          child: FlutterLogo(
+                            duration: Duration.zero,
+                            size: lerp(200, 600, 1 / (1 + logoAnimation * 10)),
+                          ),
                         ),
-                      ),
-                      CustomPaint(
-                        size: Size(lerp(200, 600, 1 / (1 + logoAnimation * 10)),
-                            lerp(200, 600, 1 / (1 + logoAnimation * 10))),
-                        painter: ImpellerLogo(time),
-                      ),
-                    ],
+                        CustomPaint(
+                          size: Size(
+                              lerp(200, 600, 1 / (1 + logoAnimation * 10)),
+                              lerp(200, 600, 1 / (1 + logoAnimation * 10))),
+                          painter: ImpellerLogo(time),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
       ],
     );
   }

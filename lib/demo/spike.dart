@@ -52,8 +52,9 @@ class Spike {
     }
 
     if (!destroyed) {
-      double distance = (gameState.player.position - position).length;
-      if (distance < 2.2) {
+      double distance =
+          (gameState.player.position + Vector3(0, 1, 0) - position).length;
+      if (distance < 1.6) {
         destroyed = true;
         startDestroyPosition = position;
         if (gameState.player.takeDamage()) {
