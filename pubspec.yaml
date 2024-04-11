@@ -34,6 +34,9 @@ flutter:
     - assets/dash.png
     - assets/potion.ogg
     - assets/machine.ogg
+    - assets/pickupCoin2.wav
+    - assets/shatter3.ogg
+    - assets/jump.wav
 
   models:
     - models/sky_sphere.glb

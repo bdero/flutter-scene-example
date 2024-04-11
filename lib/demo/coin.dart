@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter_scene/scene.dart';
 import 'package:scene_demo/demo/game.dart';
 import 'package:scene_demo/demo/math_utils.dart';
+import 'package:scene_demo/demo/sound.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 class Coin {
@@ -78,6 +79,7 @@ class Coin {
         collected = true;
         startCollectionPosition = position;
         gameState.coinsCollected++;
+        SoundServer().playPickupCoin();
       }
     }
     if (collected) {

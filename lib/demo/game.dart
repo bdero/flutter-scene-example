@@ -13,6 +13,7 @@ import 'package:scene_demo/demo/leaderboard.dart';
 import 'package:scene_demo/demo/math_utils.dart';
 import 'package:scene_demo/demo/player.dart';
 import 'package:scene_demo/demo/input_actions.dart';
+import 'package:scene_demo/demo/sound.dart';
 import 'package:scene_demo/demo/spawn.dart';
 import 'package:scene_demo/demo/spike.dart';
 import 'package:vector_math/vector_math_64.dart' as vm;
@@ -291,6 +292,7 @@ class _GameWidgetState extends State<GameWidget> {
     SoloudTools.loadFromAssets("assets/machine.ogg").then((sound) {
       gameplayMusic = sound;
     });
+    SoundServer().initialize();
 
     super.initState();
   }

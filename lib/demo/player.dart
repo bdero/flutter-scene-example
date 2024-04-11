@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter_scene/scene.dart';
 import 'package:scene_demo/demo/math_utils.dart';
+import 'package:scene_demo/demo/sound.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 enum JumpAnimationState {
@@ -132,6 +133,7 @@ class KinematicPlayer {
       _velocityY = kJumpSpeed;
       jumpCooldown = 0.2;
       _jumpState = JumpAnimationState.jumping;
+      SoundServer().playJump();
     } else if (jumpCooldown > 0) {
       // The user can hold the jump button for multiple frames to increase height.
       jumpCooldown = math.max(0, jumpCooldown - deltaSeconds);

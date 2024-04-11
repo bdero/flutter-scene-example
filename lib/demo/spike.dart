@@ -4,6 +4,7 @@ import 'package:flutter_scene/scene.dart';
 import 'package:scene_demo/demo/coin.dart';
 import 'package:scene_demo/demo/game.dart';
 import 'package:scene_demo/demo/math_utils.dart';
+import 'package:scene_demo/demo/sound.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 class Spike {
@@ -58,6 +59,8 @@ class Spike {
         if (gameState.player.takeDamage()) {
           final coinsLost = math.min(10, gameState.coinsCollected);
           gameState.coinsCollected -= coinsLost;
+
+          SoundServer().playShatter();
 
           // Coin shower.
           for (int i = 0; i < coinsLost; i++) {
