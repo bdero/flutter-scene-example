@@ -74,9 +74,10 @@ class RandomNearPlayerSpawnPattern extends SpawnPattern {
       double distance =
           minDistance + (maxDistance - minDistance) * random.nextDouble();
       double angle = random.nextDouble() * math.pi * 2;
-      vm.Vector3 spawnPosition = playerPosition +
-          vm.Vector3(
-              math.cos(angle) * distance, 1.5, math.sin(angle) * distance);
+      vm.Vector3 spawnPosition =
+          vm.Vector3(playerPosition.x, 0, playerPosition.z) +
+              vm.Vector3(
+                  math.cos(angle) * distance, 1.5, math.sin(angle) * distance);
       spawnCallback(spawnPosition);
     }
 

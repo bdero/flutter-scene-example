@@ -42,6 +42,7 @@ class InputActions {
     "Arrow Down": 0,
     "Arrow Right": 0,
     " ": 0,
+    ".": 0,
   };
 
   Map<String, double> gamepadInputState = {
@@ -63,6 +64,7 @@ class InputActions {
   Vector2 inputDirection = Vector2.zero();
 
   bool jump = false;
+  bool skipToEnd = false;
 
   void updatePlayer(KinematicPlayer player) {
     player.inputDirection = inputDirection;
@@ -99,6 +101,7 @@ class InputActions {
         );
 
     jump = keyboardInputState[" "]! > 0;
+    skipToEnd = keyboardInputState["."]! > 0;
 
     return absorbKeyEvents && keyboardInputState.containsKey(key);
   }
@@ -125,6 +128,7 @@ class InputActions {
         gamepadInputState["b.circle"]! > 0 ||
         gamepadInputState["x.circle"]! > 0 ||
         gamepadInputState["y.circle"]! > 0;
+    skipToEnd = gamepadInputState["plus.circle"]! > 0;
   }
 
   Widget getControlWidget(BuildContext context, Widget child) {

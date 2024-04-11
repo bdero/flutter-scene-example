@@ -22,7 +22,7 @@ class KinematicPlayer {
   /// Meters per second (Dash's body is exactly 2 meters wide).
   final double kMaxSpeed = 12;
 
-  final double kJumpSpeed = 10;
+  final double kJumpSpeed = 12;
 
   Vector3 _position = Vector3.zero();
   Vector3 get position {
