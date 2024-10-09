@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:gamepads/gamepads.dart';
 import 'package:scene_demo/demo/player.dart';
-import 'package:vector_math/vector_math_64.dart';
+import 'package:vector_math/vector_math.dart';
 
 /// Reads and converts raw input data from the mouse/keyboard/gamepad into high
 /// level events and state.

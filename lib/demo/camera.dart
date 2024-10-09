@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter_scene/camera.dart';
 import 'package:scene_demo/demo/math_utils.dart';
-import 'package:vector_math/vector_math_64.dart';
+import 'package:vector_math/vector_math.dart';
 
 class FollowCamera {
   static final Vector3 kFollowOffset = Vector3(0, 10, -12);
@@ -18,7 +18,7 @@ class FollowCamera {
   Vector3 position = Vector3(0, 3, -5);
   Vector3 target = Vector3.zero();
 
-  Camera get camera => Camera(position: position, target: target);
+  Camera get camera => PerspectiveCamera(position: position, target: target);
 
   void updateGameplay(
       Vector3 cameraTarget, Vector3 movementDirection, double deltaSeconds) {

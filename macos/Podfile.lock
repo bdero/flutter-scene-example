@@ -2,7 +2,7 @@ PODS:
   - flutter_soloud (0.0.1):
     - FlutterMacOS
   - FlutterMacOS (1.0.0)
-  - gamepads_darwin (0.0.1):
+  - gamepads_darwin (0.1.1):
     - FlutterMacOS
   - path_provider_foundation (0.0.1):
     - Flutter
@@ -27,8 +27,8 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   flutter_soloud: 83719ca1f200cf5f537de0740f4ef97fa36e9bb2
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
-  gamepads_darwin: a41ed976610d94faace1821c306a173e3ac55c3a
-  path_provider_foundation: 3784922295ac71e43754bd15e0653ccfd36a147c
+  gamepads_darwin: 07af6c60c282902b66574c800e20b2b26e68fda8
+  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
 
 PODFILE CHECKSUM: d7fb2b94d35968d50ae9f2d54c5701e9d7e9a8d5
 

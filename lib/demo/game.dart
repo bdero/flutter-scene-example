@@ -7,6 +7,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_scene/camera.dart';
+import 'package:flutter_scene/node.dart';
 import 'package:flutter_scene/scene.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:scene_demo/demo/camera.dart';
@@ -15,19 +17,36 @@ import 'package:scene_demo/demo/leaderboard.dart';
 import 'package:scene_demo/demo/math_utils.dart';
 import 'package:scene_demo/demo/player.dart';
 import 'package:scene_demo/demo/input_actions.dart';
+import 'package:scene_demo/demo/resource_cache.dart';
 import 'package:scene_demo/demo/sound.dart';
 import 'package:scene_demo/demo/spawn.dart';
 import 'package:scene_demo/demo/spike.dart';
-import 'package:vector_math/vector_math_64.dart' as vm;
-import 'package:vector_math/vector_math_geometry.dart';
+import 'package:vector_math/vector_math.dart' as vm;
+import 'package:vector_math/vector_math_64.dart' as vm64;
+
+class ScenePainter extends CustomPainter {
+  ScenePainter({required this.scene, required this.camera});
+  Scene scene;
+  Camera camera;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    scene.render(camera, canvas, viewport: Offset.zero & size);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
 
 class GameState {
   GameState({
+    required this.scene,
     required this.player,
   });
 
   static const kTimeLimit = 60; // Seconds.
 
+  final Scene scene;
   final KinematicPlayer player;
   int coinsCollected = 0;
 
@@ -166,13 +185,13 @@ class SheenGradientTransform extends GradientTransform {
   SheenGradientTransform(this.rotation, this.translation, this.scale);
 
   double rotation;
-  vm.Vector3 translation;
+  vm64.Vector3 translation;
   double scale;
 
   @override
-  Matrix4 transform(Rect bounds, {TextDirection? textDirection}) {
-    return Matrix4.translation(translation) *
-        Matrix4.rotationZ(rotation) *
+  vm64.Matrix4 transform(Rect bounds, {TextDirection? textDirection}) {
+    return vm64.Matrix4.translation(translation) *
+        vm64.Matrix4.rotationZ(rotation) *
         scale;
   }
 }
@@ -279,7 +298,9 @@ class VignettePainter extends CustomPainter {
 }
 
 class _GameWidgetState extends State<GameWidget> {
+  Scene scene = Scene();
   GameMode gameMode = GameMode.startMenu;
+  Node skySphere = Node();
 
   Ticker? tick;
   double time = 0;
@@ -294,8 +315,6 @@ class _GameWidgetState extends State<GameWidget> {
 
   int lastScore = 0;
 
-  SoundProps? frontendMusic;
-  SoundProps? gameplayMusic;
   int? currentMusicHandle;
 
   @override
@@ -312,14 +331,14 @@ class _GameWidgetState extends State<GameWidget> {
     );
     resetTimer();
 
-    gotoStartMenu();
+    ResourceCache.preloadAll().then((_) {
+      gotoStartMenu();
 
-    SoloudTools.loadFromAssets("assets/potion.ogg").then((sound) {
-      frontendMusic = sound;
-      playMusic(frontendMusic, true, true);
-    });
-    SoloudTools.loadFromAssets("assets/machine.ogg").then((sound) {
-      gameplayMusic = sound;
+      skySphere = ResourceCache.getModel("sky_sphere");
+      scene.add(skySphere);
+      scene.add(ResourceCache.getModel("ground"));
+
+      playMusic(ResourceCache.getSound("frontendMusic"), true, true);
     });
     SoundServer().initialize();
 
@@ -366,10 +385,13 @@ class _GameWidgetState extends State<GameWidget> {
       gameMode = GameMode.playing;
       resetTimer();
       gameState = GameState(
+        scene: scene,
         player: KinematicPlayer(),
       );
+      scene.add(gameState!.player.node);
       spawnController = SpawnController(gameState!);
-      playMusic(gameplayMusic, false, true);
+      scene.add(spawnController!.node);
+      playMusic(ResourceCache.getSound("gameplayMusic"), false, true);
     });
   }
 
@@ -377,8 +399,12 @@ class _GameWidgetState extends State<GameWidget> {
     setState(() {
       inputActions.absorbKeyEvents = true;
       gameMode = GameMode.startMenu;
-      gameState = null;
-      spawnController = null;
+      if (gameState != null) {
+        scene.remove(gameState!.player.node);
+        gameState = null;
+        scene.remove(spawnController!.node);
+        spawnController = null;
+      }
     });
   }
 
@@ -388,9 +414,11 @@ class _GameWidgetState extends State<GameWidget> {
       gameMode = GameMode.leaderboardEntry;
       resetTimer();
       lastScore = gameState!.coinsCollected;
+      scene.remove(gameState!.player.node);
       gameState = null;
+      scene.remove(spawnController!.node);
       spawnController = null;
-      playMusic(frontendMusic, true, true);
+      playMusic(ResourceCache.getSound("frontendMusic"), true, true);
     });
   }
 
@@ -433,22 +461,17 @@ class _GameWidgetState extends State<GameWidget> {
       }
     }
 
+    skySphere.localTransform = vm.Matrix4.translation(camera.position) *
+        vm.Matrix4.rotationY(time * 0.1);
+
     return Stack(
       children: [
         inputActions.getControlWidget(
           context,
-          SceneBox(
-            root: Node(children: [
-              Node.asset("models/ground.glb"),
-              Node.transform(
-                transform:
-                    Matrix4.translation(camera.position) * Matrix4.rotationY(3),
-                children: [Node.asset("models/sky_sphere.glb")],
-              ),
-              if (gameMode == GameMode.playing) gameState!.player.node,
-              if (gameMode == GameMode.playing) spawnController!.node,
-            ]),
-            camera: camera.camera,
+          SizedBox.expand(
+            child: CustomPaint(
+              painter: ScenePainter(scene: scene, camera: camera.camera),
+            ),
           ),
         ),
         if (gameMode == GameMode.playing)
@@ -484,7 +507,7 @@ class _GameWidgetState extends State<GameWidget> {
                     tileMode: TileMode.repeated,
                     transform: SheenGradientTransform(
                       math.pi / 4,
-                      vm.Vector3(-time * 150, 0, 0),
+                      vm64.Vector3(-time * 150, 0, 0),
                       5,
                     )).createShader(bounds);
               },
@@ -529,7 +552,7 @@ class _GameWidgetState extends State<GameWidget> {
                             tileMode: TileMode.repeated,
                             transform: SheenGradientTransform(
                               -math.pi / 4,
-                              vm.Vector3(time * 150, 0, 0),
+                              vm64.Vector3(time * 150, 0, 0),
                               10,
                             )).createShader(bounds);
                       },

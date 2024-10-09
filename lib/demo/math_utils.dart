@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:vector_math/vector_math_64.dart';
+import 'package:vector_math/vector_math.dart';
 
 T lerp<T>(T a, T b, double t) {
   if (a is double && b is double) {

@@ -1,10 +1,10 @@
 import 'dart:math' as math;
 
-import 'package:flutter_scene/scene.dart';
+import 'package:flutter_scene/node.dart';
 import 'package:scene_demo/demo/coin.dart';
 import 'package:scene_demo/demo/game.dart';
 import 'package:scene_demo/demo/spike.dart';
-import 'package:vector_math/vector_math_64.dart' as vm;
+import 'package:vector_math/vector_math.dart' as vm;
 
 enum SpawnType {
   coin,
@@ -114,6 +114,7 @@ class SpawnController {
   SpawnController(this.gameState);
 
   final GameState gameState;
+  final Node node = Node();
 
   final List<SpawnRule> rules = [
     SpawnRule(
@@ -375,8 +376,10 @@ class SpawnController {
           gameState.player.position, deltaSeconds, (vm.Vector3 position) {
         if (rule.spawnType == SpawnType.coin) {
           gameState.coins.add(Coin(gameState, position, vm.Vector3(0, 12, 0)));
+          node.add(gameState.coins.last.node);
         } else if (rule.spawnType == SpawnType.spike) {
           gameState.spikes.add(Spike(gameState, position));
+          node.add(gameState.spikes.last.node);
         }
       });
       if (!updateResult) {
@@ -388,22 +391,19 @@ class SpawnController {
       Coin coin = gameState.coins[i];
       if (!coin.update(deltaSeconds)) {
         gameState.coins.removeAt(i);
+        try {
+          node.remove(coin.node);
+        } catch (_) {}
       }
     }
     for (int i = gameState.spikes.length - 1; i >= 0; i--) {
       Spike spike = gameState.spikes[i];
       if (!spike.update(deltaSeconds)) {
         gameState.spikes.removeAt(i);
+        try {
+          node.remove(spike.node);
+        } catch (_) {}
       }
     }
-  }
-
-  Node get node {
-    return Node(
-      children: [
-        for (var coin in gameState.coins) coin.node,
-        for (var spike in gameState.spikes) spike.node,
-      ],
-    );
   }
 }

@@ -13,11 +13,17 @@ dependencies:
 
   cupertino_icons: ^1.0.2
   vector_math: ^2.1.4
-  flutter_scene: ^0.0.1-dev.1
+  #flutter_scene: ^0.5.0-0
+  flutter_scene:
+    path: ../flutter_scene
+  #flutter_scene_importer: ^0.2.0-0
+  flutter_scene_importer:
+    path: ../flutter_scene/importer
   gamepads: ^0.1.1
   json_annotation: ^4.8.1
   flutter_animate: ^4.5.0
   flutter_soloud: ^1.2.5
+  native_assets_cli: ^0.8.0
 
 dev_dependencies:
   flutter_test:
@@ -38,9 +44,5 @@ flutter:
     - assets/shatter3.ogg
     - assets/jump.wav
 
-  models:
-    - models/sky_sphere.glb
-    - models/dash.glb
-    - models/ground.glb
-    - models/coin.glb
-    - models/spike.glb
+    # Imported models.
+    - build/models/

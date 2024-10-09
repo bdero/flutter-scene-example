@@ -1,17 +1,22 @@
 import 'dart:math' as math;
 
-import 'package:flutter_scene/scene.dart';
+import 'package:flutter_scene/node.dart';
 import 'package:scene_demo/demo/game.dart';
 import 'package:scene_demo/demo/math_utils.dart';
+import 'package:scene_demo/demo/resource_cache.dart';
 import 'package:scene_demo/demo/sound.dart';
-import 'package:vector_math/vector_math_64.dart';
+import 'package:vector_math/vector_math.dart';
 
 class Coin {
   static const kRestingHeight = 1.5;
 
-  Coin(this.gameState, this.position, this.velocity);
+  Coin(this.gameState, this.position, this.velocity) {
+    node = ResourceCache.getModel('coin').clone();
+  }
 
   final GameState gameState;
+
+  late Node node;
 
   Vector3 position;
   Vector3 velocity;
@@ -25,19 +30,13 @@ class Coin {
   Vector3 startCollectionPosition = Vector3.zero();
   double collectAnimation = 0;
 
-  Node get node {
-    if (lifetime < 3 && lifetime % 0.2 > 0.12) {
-      return Node();
-    }
-    return Node.transform(
-      transform: Matrix4.translation(position) *
-          Matrix4.rotationY(rotation) *
-          math.min(1.0, 3 - 3 * collectAnimation) *
-          scale,
-      children: [
-        Node.asset("models/coin.glb"),
-      ],
-    );
+  void updateNode() {
+    node.visible = lifetime > 3 || lifetime % 0.2 <= 0.12;
+
+    node.globalTransform = Matrix4.translation(position) *
+        Matrix4.rotationY(rotation) *
+        math.min(1.0, 3 - 3 * collectAnimation) *
+        scale;
   }
 
   /// Returns false when the coin has completed the destruction animation.
@@ -92,6 +91,8 @@ class Coin {
     scale = lerpDeltaTime(scale, 1, 0.1, deltaSeconds);
 
     rotation += deltaSeconds * 2;
+
+    updateNode();
 
     return true;
   }

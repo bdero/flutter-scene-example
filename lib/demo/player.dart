@@ -1,9 +1,12 @@
 import 'dart:math' as math;
 
+import 'package:flutter_scene/animation.dart';
+import 'package:flutter_scene/node.dart';
 import 'package:flutter_scene/scene.dart';
 import 'package:scene_demo/demo/math_utils.dart';
+import 'package:scene_demo/demo/resource_cache.dart';
 import 'package:scene_demo/demo/sound.dart';
-import 'package:vector_math/vector_math_64.dart';
+import 'package:vector_math/vector_math.dart';
 
 enum JumpAnimationState {
   none,
@@ -13,6 +16,24 @@ enum JumpAnimationState {
 }
 
 class KinematicPlayer {
+  KinematicPlayer() {
+    node = ResourceCache.getModel('dash');
+    walkAnimation = node.createAnimationClip(node.findAnimationByName("Walk")!);
+    idleAnimation = node.createAnimationClip(node.findAnimationByName("Idle")!);
+    runAnimation = node.createAnimationClip(node.findAnimationByName("Run")!);
+    jumpStartAnimation =
+        node.createAnimationClip(node.findAnimationByName("JumpStart")!);
+    jumpLandAnimation =
+        node.createAnimationClip(node.findAnimationByName("JumpLand")!);
+  }
+
+  late Node node;
+  late AnimationClip walkAnimation;
+  late AnimationClip idleAnimation;
+  late AnimationClip runAnimation;
+  late AnimationClip jumpStartAnimation;
+  late AnimationClip jumpLandAnimation;
+
   /// 1/n seconds from zero velocity to full velocity.
   final double kAccelerationRate = 8;
 
@@ -60,39 +81,39 @@ class KinematicPlayer {
   double jumpStartWeight = 0;
   double landingWeight = 0;
 
-  Node get node {
-    if (damageCooldown % 0.2 > 0.12) {
-      return Node();
-    }
+  void updateNode() {
+    node.visible = damageCooldown % 0.2 <= 0.12;
 
     Matrix4 transform = Matrix4.translation(_position) *
         Matrix4.rotationY(
-            Vector3(0, 0, -1).angleToSigned(_direction, Vector3(0, 1, 0)));
+            Vector3(0, 0, 1).angleToSigned(_direction, Vector3(0, 1, 0)));
 
     double speed = _velocityXZ.length;
 
-    Node characterModel = Node.asset("models/dash.glb");
+    walkAnimation.playing = false;
+    walkAnimation.loop = true;
+    walkAnimation.weight = 0;
 
-    characterModel.setAnimationState("Walk", false, true, 0.0, 1.0);
-    characterModel.setAnimationState(
-        "Idle", true, true, (1 - speed) * groundedWeight, 1.2);
-    characterModel.setAnimationState(
-        "Run", true, true, speed * groundedWeight, 1.2);
+    idleAnimation.playing = true;
+    idleAnimation.loop = true;
+    idleAnimation.weight = (1 - speed) * groundedWeight;
+    idleAnimation.playbackTimeScale = 1.2;
 
-    characterModel.setAnimationState(
-        "JumpStart",
-        _jumpState == JumpAnimationState.jumping ||
-            _jumpState == JumpAnimationState.falling,
-        false,
-        jumpStartWeight,
-        1.0);
-    characterModel.setAnimationState("JumpLand",
-        _jumpState == JumpAnimationState.landing, false, landingWeight, 1.0);
+    runAnimation.playing = true;
+    runAnimation.loop = true;
+    runAnimation.weight = speed * groundedWeight;
+    runAnimation.playbackTimeScale = 1.2;
 
-    return Node.transform(
-      transform: transform,
-      children: [characterModel],
-    );
+    jumpStartAnimation.playing = _jumpState == JumpAnimationState.jumping ||
+        _jumpState == JumpAnimationState.falling;
+    jumpStartAnimation.loop = false;
+    jumpStartAnimation.weight = jumpStartWeight;
+
+    jumpLandAnimation.playing = _jumpState == JumpAnimationState.landing;
+    jumpLandAnimation.loop = false;
+    jumpLandAnimation.weight = landingWeight;
+
+    node.globalTransform = transform;
   }
 
   /// Returns true if the player took damage.
@@ -240,5 +261,7 @@ class KinematicPlayer {
               0.2);
       rotation.rotate(_direction);
     }
+
+    updateNode();
   }
 }
