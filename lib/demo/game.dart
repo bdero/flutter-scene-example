@@ -1,14 +1,9 @@
-import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_scene/camera.dart';
-import 'package:flutter_scene/node.dart';
 import 'package:flutter_scene/scene.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:scene_demo/demo/camera.dart';
@@ -147,7 +142,7 @@ class GameplayHUD extends StatelessWidget {
           child: HUDBox(
             child: HUDLabelText(
               label: "💰 ",
-              value: gameState!.coinsCollected.toString().padLeft(3, "0"),
+              value: gameState.coinsCollected.toString().padLeft(3, "0"),
             ),
           ),
         ),
@@ -182,11 +177,11 @@ class SpringCurve extends Curve {
 }
 
 class SheenGradientTransform extends GradientTransform {
-  SheenGradientTransform(this.rotation, this.translation, this.scale);
+  const SheenGradientTransform(this.rotation, this.translation, this.scale);
 
-  double rotation;
-  vm64.Vector3 translation;
-  double scale;
+  final double rotation;
+  final vm64.Vector3 translation;
+  final double scale;
 
   @override
   vm64.Matrix4 transform(Rect bounds, {TextDirection? textDirection}) {
@@ -282,7 +277,7 @@ class VignettePainter extends CustomPainter {
       ..shader = RadialGradient(
         radius: 1.0,
         colors: [Colors.transparent, color],
-        stops: [0.2, 1.0],
+        stops: const [0.2, 1.0],
       ).createShader(
         Rect.fromLTRB(0, 0, size.width, size.height),
       )
@@ -315,7 +310,7 @@ class _GameWidgetState extends State<GameWidget> {
 
   int lastScore = 0;
 
-  int? currentMusicHandle;
+  SoundHandle? currentMusicHandle;
 
   @override
   void initState() {
@@ -345,29 +340,27 @@ class _GameWidgetState extends State<GameWidget> {
     super.initState();
   }
 
-  void playMusic(SoundProps? music, bool loop, bool fadeIn) {
+  Future<void> playMusic(AudioSource? music, bool loop, bool fadeIn) async {
     if (currentMusicHandle != null) {
-      SoLoud().stop(currentMusicHandle!);
+      SoLoud.instance.stop(currentMusicHandle!);
+      currentMusicHandle = null;
     }
     if (music != null) {
-      SoLoud().play(music, volume: 0.0).then((value) {
-        if (value.error != PlayerErrors.noError) {
-          debugPrint('SoLoud error: ${value.error}');
-        }
-        currentMusicHandle = value.newHandle;
+      try {
+        final handle = await SoLoud.instance.play(music, volume: 0.0);
+        currentMusicHandle = handle;
+
         if (loop) {
-          final loopingResult = SoLoud().setLooping(value.newHandle, true);
-          if (loopingResult != PlayerErrors.noError) {
-            debugPrint('SoLoud error: $value');
-          }
+          SoLoud.instance.setLooping(handle, true);
         }
+
         if (fadeIn) {
-          final fadeVolumeResult = SoLoud().fadeVolume(value.newHandle, 1, 0.5);
-          if (fadeVolumeResult != PlayerErrors.noError) {
-            debugPrint('SoLoud error: $value');
-          }
+          SoLoud.instance
+              .fadeVolume(handle, 1.0, const Duration(milliseconds: 500));
         }
-      });
+      } catch (error) {
+        debugPrint('Error playing music: $error');
+      }
     }
   }
 
@@ -581,7 +574,7 @@ class _GameWidgetState extends State<GameWidget> {
                   .slide(duration: 1.5.seconds, curve: SpringCurve())
                   .flip(),
               const SizedBox(height: 50),
-              LeaderboardWidget()
+              const LeaderboardWidget()
             ],
           )),
         if (gameMode == GameMode.leaderboardEntry)

@@ -3,7 +3,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:gamepads/gamepads.dart';
 import 'package:scene_demo/demo/player.dart';
 import 'package:vector_math/vector_math.dart';
@@ -107,7 +106,7 @@ class InputActions {
   }
 
   void _onGamepadEvent(GamepadEvent event) {
-    print("Gamepad data: ${event}");
+    print("Gamepad data: $event");
 
     if (gamepadInputState.containsKey(event.key)) {
       gamepadInputState[event.key] = event.value;

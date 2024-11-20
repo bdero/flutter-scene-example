@@ -1,6 +1,4 @@
-import 'package:flutter_scene/material/physically_based_material.dart';
-import 'package:flutter_scene/material/unlit_material.dart';
-import 'package:flutter_scene/node.dart';
+import 'package:flutter_scene/scene.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 
 Node convertToUnlit(Node node) {
@@ -22,7 +20,7 @@ Node convertToUnlit(Node node) {
 
 class ResourceCache {
   static final Map<String, Node> _models = {};
-  static final Map<String, SoundProps?> _sounds = {};
+  static final Map<String, AudioSource?> _sounds = {};
 
   static Future<void> preloadAll() async {
     await Future.wait([
@@ -41,10 +39,10 @@ class ResourceCache {
       Node.fromAsset("build/models/spike.model").then((node) {
         _models["spike"] = convertToUnlit(node);
       }),
-      SoloudTools.loadFromAssets("assets/potion.ogg").then((sound) {
+      SoLoud.instance.loadFile("assets/potion.ogg").then((sound) {
         _sounds["frontendMusic"] = sound;
       }),
-      SoloudTools.loadFromAssets("assets/machine.ogg").then((sound) {
+      SoLoud.instance.loadFile("assets/machine.ogg").then((sound) {
         _sounds["gameplayMusic"] = sound;
       }),
     ]);
@@ -54,7 +52,7 @@ class ResourceCache {
     return _models[name]!;
   }
 
-  static SoundProps? getSound(String name) {
+  static AudioSource? getSound(String name) {
     return _sounds[name];
   }
 }

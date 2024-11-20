@@ -1,9 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:flutter_scene/animation.dart';
-import 'package:flutter_scene/node.dart';
 import 'package:flutter_scene/scene.dart';
-import 'package:scene_demo/demo/math_utils.dart';
 import 'package:scene_demo/demo/resource_cache.dart';
 import 'package:scene_demo/demo/sound.dart';
 import 'package:vector_math/vector_math.dart';
@@ -51,7 +48,7 @@ class KinematicPlayer {
     return _position;
   }
 
-  Vector3 _direction = Vector3(0, 0, -1);
+  final Vector3 _direction = Vector3(0, 0, -1);
 
   /// Magnitude range: 0 -> 1. Multiplied by kMaxSpeed.
   Vector2 _velocityXZ = Vector2.zero();

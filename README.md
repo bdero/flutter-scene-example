@@ -4,6 +4,14 @@
   <img alt="Flutter Scene" width="600px" src="https://raw.githubusercontent.com/gist/bdero/4f34a4dfe78a4a83d54788bc4f5bcf07/raw/ff137e3fdd0b1bb8808d5ff08f5c1c94e8a30665/dashgameported2.gif">
 </p>
 
+## Prerequisites
+
+1. You must have [CMake](https://cmake.org/download/) installed.
+   - On macOS, install CMake via [Homebrew](https://brew.sh/) using the following command:
+     ```bash
+     brew install cmake
+     ```
+
 ## How to run
 
 1. Switch to Flutter's [main channel](https://docs.flutter.dev/release/upgrade#other-channels).

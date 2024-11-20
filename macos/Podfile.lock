@@ -25,11 +25,11 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin
 
 SPEC CHECKSUMS:
-  flutter_soloud: 83719ca1f200cf5f537de0740f4ef97fa36e9bb2
+  flutter_soloud: 401bea07fc43636ab5c6777f7adf691403d0ea48
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
   gamepads_darwin: 07af6c60c282902b66574c800e20b2b26e68fda8
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
 
 PODFILE CHECKSUM: d7fb2b94d35968d50ae9f2d54c5701e9d7e9a8d5
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2
