@@ -24,19 +24,19 @@ class ResourceCache {
 
   static Future<void> preloadAll() async {
     await Future.wait([
-      Node.fromAsset("models/dash.glb").then((node) {
+      Node.fromAsset("build/models/dash.model").then((node) {
         _models["dash"] = convertToUnlit(node);
       }),
-      Node.fromAsset("models/ground.glb").then((node) {
+      Node.fromAsset("build/models/ground.model").then((node) {
         _models["ground"] = convertToUnlit(node);
       }),
-      Node.fromAsset("models/sky_sphere.glb").then((node) {
+      Node.fromAsset("build/models/sky_sphere.model").then((node) {
         _models["sky_sphere"] = convertToUnlit(node);
       }),
-      Node.fromAsset("models/coin.glb").then((node) {
+      Node.fromAsset("build/models/coin.model").then((node) {
         _models["coin"] = convertToUnlit(node);
       }),
-      Node.fromAsset("models/spike.glb").then((node) {
+      Node.fromAsset("build/models/spike.model").then((node) {
         _models["spike"] = convertToUnlit(node);
       }),
       SoLoud.instance.loadFile("assets/potion.ogg").then((sound) {
