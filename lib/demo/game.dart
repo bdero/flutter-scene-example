@@ -137,22 +137,28 @@ class GameplayHUD extends StatelessWidget {
     double secondsRemaining = math.max(0, GameState.kTimeLimit - time);
     return Row(
       children: [
-        Container(
-          padding: const EdgeInsets.all(20),
-          child: HUDBox(
-            child: HUDLabelText(
-              label: "💰 ",
-              value: gameState.coinsCollected.toString().padLeft(3, "0"),
+        Expanded(
+          // Ensures the widget fits within available space
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            child: HUDBox(
+              child: HUDLabelText(
+                label: "💰 ",
+                value: gameState.coinsCollected.toString().padLeft(3, "0"),
+              ),
             ),
           ),
         ),
         const Spacer(),
-        Container(
-          padding: const EdgeInsets.all(20),
-          child: HUDBox(
-            child: HUDLabelText(
-              label: "⏱ ",
-              value: secondsToFormattedTime(secondsRemaining),
+        Expanded(
+          // Ensures the widget fits within available space
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            child: HUDBox(
+              child: HUDLabelText(
+                label: "⏱ ",
+                value: secondsToFormattedTime(secondsRemaining),
+              ),
             ),
           ),
         ),
@@ -613,19 +619,24 @@ class _GameWidgetState extends State<GameWidget> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        ColorFiltered(
-                          colorFilter: const ui.ColorFilter.mode(
-                              Colors.white, BlendMode.srcATop),
-                          child: FlutterLogo(
-                            duration: Duration.zero,
-                            size: lerp(200, 600, 1 / (1 + logoAnimation * 10)),
+                        Flexible(
+                          child: ColorFiltered(
+                            colorFilter: const ui.ColorFilter.mode(
+                                Colors.white, BlendMode.srcATop),
+                            child: FlutterLogo(
+                              duration: Duration.zero,
+                              size:
+                                  lerp(200, 600, 1 / (1 + logoAnimation * 10)),
+                            ),
                           ),
                         ),
-                        CustomPaint(
-                          size: Size(
-                              lerp(200, 600, 1 / (1 + logoAnimation * 10)),
-                              lerp(200, 600, 1 / (1 + logoAnimation * 10))),
-                          painter: ImpellerLogo(time),
+                        Flexible(
+                          child: CustomPaint(
+                            size: Size(
+                                lerp(200, 600, 1 / (1 + logoAnimation * 10)),
+                                lerp(200, 600, 1 / (1 + logoAnimation * 10))),
+                            painter: ImpellerLogo(time),
+                          ),
                         ),
                       ],
                     ),
