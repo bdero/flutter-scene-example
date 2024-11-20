@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 
 class SoundServer {
@@ -11,40 +12,49 @@ class SoundServer {
 
   SoundServer._internal();
 
-  SoundProps? pickupCoinSound;
-  SoundProps? shatterSound;
-  SoundProps? jumpSound;
+  AudioSource? pickupCoinSound;
+  AudioSource? shatterSound;
+  AudioSource? jumpSound;
 
   void initialize() {
-    SoloudTools.loadFromAssets("assets/pickupCoin2.wav").then((sound) {
+    SoLoud.instance.loadFile("assets/pickupCoin2.wav").then((sound) {
       pickupCoinSound = sound;
+    }).catchError((error) {
+      debugPrint("Error loading pickupCoin2.wav: $error");
     });
-    SoloudTools.loadFromAssets("assets/shatter3.ogg").then((sound) {
+
+    SoLoud.instance.loadFile("assets/shatter3.ogg").then((sound) {
       shatterSound = sound;
+    }).catchError((error) {
+      debugPrint("Error loading shatter3.ogg: $error");
     });
-    SoloudTools.loadFromAssets("assets/jump.wav").then((sound) {
+
+    SoLoud.instance.loadFile("assets/jump.wav").then((sound) {
       jumpSound = sound;
+    }).catchError((error) {
+      debugPrint("Error loading jump.wav: $error");
     });
   }
 
-  void playPickupCoin() {
+  Future<void> playPickupCoin() async {
     if (pickupCoinSound != null) {
-      SoLoud().play(pickupCoinSound!, volume: 0.4).then((value) {
-        SoLoud()
-            .setRelativePlaySpeed(value.newHandle, (Random().nextDouble() - 0.5) * 0.2 + 1.0);
-      });
+      final handle = await SoLoud.instance.play(pickupCoinSound!, volume: 0.4);
+      SoLoud.instance.setRelativePlaySpeed(
+        handle,
+        (Random().nextDouble() - 0.5) * 0.2 + 1.0,
+      );
     }
   }
 
-  void playShatter() {
+  Future<void> playShatter() async {
     if (shatterSound != null) {
-      SoLoud().play(shatterSound!, volume: 1.0);
+      await SoLoud.instance.play(shatterSound!, volume: 1.0);
     }
   }
 
-  void playJump() {
+  Future<void> playJump() async {
     if (jumpSound != null) {
-      SoLoud().play(jumpSound!, volume: 0.4);
+      await SoLoud.instance.play(jumpSound!, volume: 0.4);
     }
   }
 }

@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:flutter_scene/camera.dart';
+import 'package:flutter_scene/scene.dart';
 import 'package:scene_demo/demo/math_utils.dart';
 import 'package:vector_math/vector_math.dart';
 

@@ -13,17 +13,13 @@ dependencies:
 
   cupertino_icons: ^1.0.2
   vector_math: ^2.1.4
-  #flutter_scene: ^0.5.0-0
-  flutter_scene:
-    path: ../flutter_scene
-  #flutter_scene_importer: ^0.2.0-0
-  flutter_scene_importer:
-    path: ../flutter_scene/importer
-  gamepads: ^0.1.1
-  json_annotation: ^4.8.1
+  flutter_scene: ^0.7.0-0
+  flutter_scene_importer: ^0.7.0-0
+  gamepads: ^0.1.4
+  json_annotation: ^4.9.0
   flutter_animate: ^4.5.0
-  flutter_soloud: ^1.2.5
-  native_assets_cli: ^0.8.0
+  flutter_soloud: ^2.1.7
+  native_assets_cli: ^0.9.0
 
 dev_dependencies:
   flutter_test:
@@ -45,4 +41,4 @@ flutter:
     - assets/jump.wav
 
     # Imported models.
-    - build/models/
+    - models/

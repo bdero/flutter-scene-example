@@ -2,25 +2,25 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:scene_demo/demo/game.dart';
 
 void main() async {
-  final value = await SoLoud().startIsolate();
-  if (value == PlayerErrors.noError) {
-    debugPrint('SoLoud isolate started');
-  } else {
-    debugPrint('SoLoud isolate error: $value');
-  }
+  WidgetsFlutterBinding.ensureInitialized();
+  final soloud = SoLoud.instance;
 
-  runApp(const DemoApp());
+  soloud.init().then((_) {
+    debugPrint("SoLoud initialized.");
+  }).catchError((error) {
+    debugPrint("SoLoud initialization failed: $error");
+  });
+
+  runApp(const SceneExample());
 }
 
-class DemoApp extends StatelessWidget {
-  const DemoApp({super.key});
+class SceneExample extends StatelessWidget {
+  const SceneExample({super.key});
 
   // This widget is the root of your application.
   @override
@@ -28,9 +28,10 @@ class DemoApp extends StatelessWidget {
     return MaterialApp(
       title: 'Scene Demo',
       theme: ThemeData(
-          useMaterial3: true,
-          primarySwatch: Colors.blue,
-          scaffoldBackgroundColor: const Color(0xFF3a3a3a)),
+        useMaterial3: true,
+        primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: const Color(0xFF3a3a3a),
+      ),
       home: const DemoPage(),
     );
   }
@@ -46,8 +47,6 @@ class DemoPage extends StatefulWidget {
 class _DemoPageState extends State<DemoPage> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: GameWidget(),
-    );
+    return const Scaffold(body: GameWidget());
   }
 }

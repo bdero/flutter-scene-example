@@ -9,7 +9,7 @@ part of 'leaderboard.dart';
 LeaderboardEntry _$LeaderboardEntryFromJson(Map<String, dynamic> json) =>
     LeaderboardEntry(
       json['name'] as String,
-      json['score'] as int,
+      (json['score'] as num).toInt(),
     );
 
 Map<String, dynamic> _$LeaderboardEntryToJson(LeaderboardEntry instance) =>

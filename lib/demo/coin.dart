@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:flutter_scene/node.dart';
+import 'package:flutter_scene/scene.dart';
 import 'package:scene_demo/demo/game.dart';
 import 'package:scene_demo/demo/math_utils.dart';
 import 'package:scene_demo/demo/resource_cache.dart';

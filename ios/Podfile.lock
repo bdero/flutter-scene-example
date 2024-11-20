@@ -2,6 +2,8 @@ PODS:
   - Flutter (1.0.0)
   - flutter_soloud (0.0.1):
     - Flutter
+  - gamepads_ios (0.1.1):
+    - Flutter
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -9,6 +11,7 @@ PODS:
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_soloud (from `.symlinks/plugins/flutter_soloud/ios`)
+  - gamepads_ios (from `.symlinks/plugins/gamepads_ios/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
 
 EXTERNAL SOURCES:
@@ -16,14 +19,17 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_soloud:
     :path: ".symlinks/plugins/flutter_soloud/ios"
+  gamepads_ios:
+    :path: ".symlinks/plugins/gamepads_ios/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
 
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  flutter_soloud: a49590bf8d8be2c55b50f4d4e819b764901a4946
-  path_provider_foundation: 3784922295ac71e43754bd15e0653ccfd36a147c
+  flutter_soloud: 12a37f5fb426c94671d762cbb059bbeb1b46ad97
+  gamepads_ios: 1d2930c7a4450a9a1b57444ebf305a6a6cbeea0b
+  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
 
 PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

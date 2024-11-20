@@ -34,18 +34,18 @@ packages:
     dependency: transitive
     description:
       name: async
-      sha256: "947bfcf187f74dbc5e146c9eb9c0f10c9f8b30743e341481c1e2ed3ecc18c20c"
+      sha256: d2872f9c19731c2e5f10444b14686eb7cc85c76274bd6c16e1816bff9a3bab63
       url: "https://pub.dev"
     source: hosted
-    version: "2.11.0"
+    version: "2.12.0"
   boolean_selector:
     dependency: transitive
     description:
       name: boolean_selector
-      sha256: "6cfb5af12253eaf2b368f07bacc5a80d1301a071c73360d746b7f2e32d762c66"
+      sha256: "8aab1771e1243a5063b8b0ff68042d67334e3feab9e95b9490f9a6ebf73b42ea"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.1"
+    version: "2.1.2"
   build:
     dependency: transitive
     description:
@@ -126,22 +126,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.3"
-  cli_config:
-    dependency: transitive
-    description:
-      name: cli_config
-      sha256: ac20a183a07002b700f0c25e61b7ee46b23c309d76ab7b7640a028f18e4d99ec
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.0"
   clock:
     dependency: transitive
     description:
       name: clock
-      sha256: cb6d7f03e1de671e34607e909a7213e31d7752be4fb66a86d29fe1eb14bfb5cf
+      sha256: fddb70d9b5277016c77a80201021d40a2247104d9f4aa7bab7157b7e3f05b84b
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.1"
+    version: "1.1.2"
   code_builder:
     dependency: transitive
     description:
@@ -202,10 +194,10 @@ packages:
     dependency: transitive
     description:
       name: fake_async
-      sha256: "511392330127add0b769b75a987850d136345d9227c6b94c96a04cf4a391bf78"
+      sha256: "6a95e56b2449df2273fd8c45a662d6947ce1ebb7aafe80e550a3f68297f3cacc"
       url: "https://pub.dev"
     source: hosted
-    version: "1.3.1"
+    version: "1.3.2"
   ffi:
     dependency: transitive
     description:
@@ -252,10 +244,10 @@ packages:
     dependency: transitive
     description:
       name: flutter_gpu_shaders
-      sha256: "6db72cf8039eebed6d56f782c505904e66611bd97fb822fb1a1ee415e7fe4402"
+      sha256: f8a74a89794c6a4e85dae054043830f62240a2b4ed9773061198aa8c0ad151b1
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.3"
+    version: "0.2.0"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -267,17 +259,19 @@ packages:
   flutter_scene:
     dependency: "direct main"
     description:
-      path: "../flutter_scene"
-      relative: true
-    source: path
-    version: "0.4.0-0"
+      name: flutter_scene
+      sha256: "24dde4a00f7f356b332d11ee3ca5dd280a6c962c073fb095edd580965ebd216b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.0-0"
   flutter_scene_importer:
     dependency: "direct main"
     description:
-      path: "../flutter_scene/importer"
-      relative: true
-    source: path
-    version: "0.1.2-3"
+      name: flutter_scene_importer
+      sha256: "4af400adecbf1b2600e07e6a8eab61a3b71c358b1979e791841355184020f3e6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.0-0"
   flutter_shaders:
     dependency: transitive
     description:
@@ -290,10 +284,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_soloud
-      sha256: "17665a7c12c884f37b62a053722a054bfce92e1e9cc998df8f635b83fc55e218"
+      sha256: c1f678187c9f11d22edde1fbcfe0fd51d932b7fc9098c609cb2ff071a5e3dc7a
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.5"
+    version: "2.1.7"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -311,58 +305,58 @@ packages:
     dependency: "direct main"
     description:
       name: gamepads
-      sha256: a71b8ce0a71d5f0977f4ea761f320421679f5bd7a70d10362e2e6985f772c785
+      sha256: a7f9b937c9854295a7564e8482afecd678c0601b585407b473f057afec205f2c
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.2"
+    version: "0.1.4"
   gamepads_android:
     dependency: transitive
     description:
       name: gamepads_android
-      sha256: d7b329d279fe230e5b255bc146c8b5c988bd139fc318d118586c1d1fdf7f52ee
+      sha256: "2e793ef0e841326666c008b4a29faf2582166838988ba7df99d82ed0abae3326"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.2"
+    version: "0.1.2+2"
   gamepads_darwin:
     dependency: transitive
     description:
       name: gamepads_darwin
-      sha256: "6fc0395e8605bbdea8fc0887c1906602e9de0220275c9ca8cbbb085633194f18"
+      sha256: "91250975ee196703816c55117502ec53ce4a1b881ca50dec1d0fbcb9fbb75eff"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.2"
+    version: "0.1.2+2"
   gamepads_ios:
     dependency: transitive
     description:
       name: gamepads_ios
-      sha256: "2e0e5e699d674f31eed53ae0cf6cb9cbf2c9e00042862794215fc1bd51c4006a"
+      sha256: aaea0aadc1a386f7772c096677b111e7dc2e12f92d0dfd7df8db78cb1b112795
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.2"
+    version: "0.1.2+2"
   gamepads_linux:
     dependency: transitive
     description:
       name: gamepads_linux
-      sha256: ade4c1a17f57cdf288201d1c70a360f76c446e0df6e5881cf4d3f8d79f63bd9a
+      sha256: f4c17915a84400d7f624aadb6371424ada596eedff2a25663121453e65917e0d
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.1+1"
+    version: "0.1.1+3"
   gamepads_platform_interface:
     dependency: transitive
     description:
       name: gamepads_platform_interface
-      sha256: b659d9103ff2bfd2d5d6d0863bb63446f384c0c545cd989f89adc953b561c7e5
+      sha256: ddab8677a4137d92e381b04cc97a8081ae4b75673dc0f24c846618d2b5226c4f
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.1"
+    version: "0.1.2+1"
   gamepads_windows:
     dependency: transitive
     description:
       name: gamepads_windows
-      sha256: ae2aa9436757cf8af3bb79fa0813e09ed92d9d93e3c0998619021f5d9ba591ad
+      sha256: "8f2fc692f4c852602d180c6aa51e917b09d725b896190c13d5456536f4cab2b1"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.1+1"
+    version: "0.1.1+3"
   glob:
     dependency: transitive
     description:
@@ -439,18 +433,18 @@ packages:
     dependency: transitive
     description:
       name: leak_tracker
-      sha256: "7bb2830ebd849694d1ec25bf1f44582d6ac531a57a365a803a6034ff751d2d06"
+      sha256: c35baad643ba394b40aac41080300150a4f08fd0fd6a10378f8f7c6bc161acec
       url: "https://pub.dev"
     source: hosted
-    version: "10.0.7"
+    version: "10.0.8"
   leak_tracker_flutter_testing:
     dependency: transitive
     description:
       name: leak_tracker_flutter_testing
-      sha256: "9491a714cca3667b60b5c420da8217e6de0d1ba7a5ec322fab01758f6998f379"
+      sha256: f8b613e7e6a13ec79cfdc0e97638fddb3ab848452eff057653abd3edba760573
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.8"
+    version: "3.0.9"
   leak_tracker_testing:
     dependency: transitive
     description:
@@ -519,10 +513,10 @@ packages:
     dependency: "direct main"
     description:
       name: native_assets_cli
-      sha256: db902509468ec2a6c6d11fa9ce02805ede280e8dbfb5f0014ef3de8483cadfce
+      sha256: "9573f442a27000af0597639bf8a3db24f23cf6cbab7469ce3b9c80f585075e6b"
       url: "https://pub.dev"
     source: hosted
-    version: "0.8.0"
+    version: "0.9.0"
   node_preamble:
     dependency: transitive
     description:
@@ -543,10 +537,10 @@ packages:
     dependency: transitive
     description:
       name: path
-      sha256: "087ce49c3f0dc39180befefc60fdb4acd8f8620e5682fe2476afd0b3688bb4af"
+      sha256: "75cca69d1490965be98c73ceaea117e8a04dd21217b37b292c9ddbec0d955bc5"
       url: "https://pub.dev"
     source: hosted
-    version: "1.9.0"
+    version: "1.9.1"
   path_provider:
     dependency: transitive
     description:
@@ -740,10 +734,10 @@ packages:
     dependency: transitive
     description:
       name: string_scanner
-      sha256: "688af5ed3402a4bde5b3a6c15fd768dbf2621a614950b17f04626c431ab3c4c3"
+      sha256: "0bd04f5bb74fcd6ff0606a888a30e917af9bd52820b178eaa464beb11dca84b6"
       url: "https://pub.dev"
     source: hosted
-    version: "1.3.0"
+    version: "1.4.0"
   term_glyph:
     dependency: transitive
     description:
@@ -804,10 +798,10 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: f6be3ed8bd01289b34d679c2b62226f63c0e69f9fd2e50a6b3c1c729a961041b
+      sha256: "0968250880a6c5fe7edc067ed0a13d4bae1577fe2771dcf3010d52c4a9d3ca14"
       url: "https://pub.dev"
     source: hosted
-    version: "14.3.0"
+    version: "14.3.1"
   watcher:
     dependency: transitive
     description:
@@ -865,5 +859,5 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.6.0-0 <4.0.0"
+  dart: ">=3.7.0-75.0.dev <4.0.0"
   flutter: ">=3.24.0"
