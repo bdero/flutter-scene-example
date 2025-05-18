@@ -19,10 +19,10 @@ dependencies:
   flutter_scene_importer: ^0.9.0-0
   #flutter_scene_importer:
   #  path: ../flutter_scene/importer
-  gamepads: ^0.1.5
+  gamepads: ^0.1.7
   json_annotation: ^4.9.0
   flutter_animate: ^4.5.2
-  flutter_soloud: ^3.1.6
+  flutter_soloud: ^3.1.10
   native_assets_cli: ^0.13.0
 
 dev_dependencies:
