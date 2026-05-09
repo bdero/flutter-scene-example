@@ -111,7 +111,9 @@ class SpawnRule {
 }
 
 class SpawnController {
-  SpawnController(this.gameState);
+  SpawnController(this.gameState) {
+    gameState.spawnRoot = node;
+  }
 
   final GameState gameState;
   final Node node = Node();
@@ -375,8 +377,7 @@ class SpawnController {
       final updateResult = rule.pattern.update(
           gameState.player.position, deltaSeconds, (vm.Vector3 position) {
         if (rule.spawnType == SpawnType.coin) {
-          gameState.coins.add(Coin(gameState, position, vm.Vector3(0, 12, 0)));
-          node.add(gameState.coins.last.node);
+          gameState.addCoin(Coin(gameState, position, vm.Vector3(0, 12, 0)));
         } else if (rule.spawnType == SpawnType.spike) {
           gameState.spikes.add(Spike(gameState, position));
           node.add(gameState.spikes.last.node);

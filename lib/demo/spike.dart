@@ -73,7 +73,7 @@ class Spike {
                     5, //
                     math.sin(xzAngle))
                 .normalized();
-            gameState.coins.add(Coin(
+            gameState.addCoin(Coin(
               gameState,
               gameState.player.position + direction * 2.3,
               direction * 15,

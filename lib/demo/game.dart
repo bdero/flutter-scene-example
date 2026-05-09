@@ -48,8 +48,20 @@ class GameState {
   final KinematicPlayer player;
   int coinsCollected = 0;
 
+  /// Parent node that owns spawned coins/spikes in the scene graph. Set by
+  /// [SpawnController] on construction so other systems (e.g. spike damage
+  /// showers) can spawn coins that actually appear on screen.
+  Node? spawnRoot;
+
   final List<Coin> coins = [];
   final List<Spike> spikes = [];
+
+  /// Adds a coin to the active list and attaches its node to the spawn root
+  /// so it renders. No-op for the node attach if [spawnRoot] is unset.
+  void addCoin(Coin coin) {
+    coins.add(coin);
+    spawnRoot?.add(coin.node);
+  }
 }
 
 class GameWidget extends StatefulWidget {
