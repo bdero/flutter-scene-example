@@ -159,6 +159,9 @@ class KinematicPlayer {
       _velocityY = kJumpSpeed;
       jumpCooldown = 0.2;
       _jumpState = JumpAnimationState.jumping;
+      // Replay the JumpStart clip from the beginning. The clip is non-looping
+      // and would otherwise stay paused at its end pose after the first jump.
+      jumpStartAnimation.seek(0);
       SoundServer().playJump();
     } else if (jumpCooldown > 0) {
       // The user can hold the jump button for multiple frames to increase height.
@@ -178,12 +181,18 @@ class KinematicPlayer {
         } else if (onGround) {
           _jumpState = JumpAnimationState.landing;
           landingAnimationCooldown = 0.4;
+          // Replay the JumpLand clip from the beginning. Same reasoning as
+          // the JumpStart seek above: non-looping clips don't auto-rewind.
+          jumpLandAnimation.seek(0);
         }
         break;
       case JumpAnimationState.falling:
         if (onGround) {
           _jumpState = JumpAnimationState.landing;
           landingAnimationCooldown = 0.4;
+          // Replay the JumpLand clip from the beginning. Same reasoning as
+          // the JumpStart seek above: non-looping clips don't auto-rewind.
+          jumpLandAnimation.seek(0);
         }
         break;
       case JumpAnimationState.landing:
