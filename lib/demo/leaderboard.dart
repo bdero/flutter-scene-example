@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:scene_demo/demo/game.dart';
+import 'package:scene_demo/demo/hud_box.dart';
 
 part 'leaderboard.g.dart';
 

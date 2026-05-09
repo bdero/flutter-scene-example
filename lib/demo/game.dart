@@ -11,6 +11,7 @@ import 'package:flutter_scene/scene.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:scene_demo/demo/camera.dart';
 import 'package:scene_demo/demo/coin.dart';
+import 'package:scene_demo/demo/hud_box.dart';
 import 'package:scene_demo/demo/leaderboard.dart';
 import 'package:scene_demo/demo/math_utils.dart';
 import 'package:scene_demo/demo/player.dart';
@@ -69,39 +70,6 @@ class GameWidget extends StatefulWidget {
 
   @override
   State<GameWidget> createState() => _GameWidgetState();
-}
-
-class HUDBox extends StatelessWidget {
-  const HUDBox({super.key, required this.child});
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          color: Colors.white.withOpacity(0.1),
-          child: DefaultTextStyle.merge(
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 30,
-              shadows: [
-                Shadow(
-                  blurRadius: 4,
-                  color: Colors.black,
-                  offset: Offset(2, 2),
-                ),
-              ],
-            ),
-            child: child,
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class HUDLabelText extends StatelessWidget {
