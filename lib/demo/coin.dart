@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:flutter_scene/node.dart';
+import 'package:flutter_scene/scene.dart';
 import 'package:scene_demo/demo/game.dart';
 import 'package:scene_demo/demo/math_utils.dart';
 import 'package:scene_demo/demo/resource_cache.dart';
@@ -11,12 +11,14 @@ class Coin {
   static const kRestingHeight = 1.5;
 
   Coin(this.gameState, this.position, this.velocity) {
-    node = ResourceCache.getModel('coin').clone();
+    node.add(ResourceCache.getModel('coin').clone());
   }
 
   final GameState gameState;
 
-  late Node node;
+  /// Positioning wrapper. The cloned coin model lives as a child so the
+  /// importer's coordinate-flip on the model root stays intact.
+  final Node node = Node();
 
   Vector3 position;
   Vector3 velocity;
@@ -33,7 +35,7 @@ class Coin {
   void updateNode() {
     node.visible = lifetime > 3 || lifetime % 0.2 <= 0.12;
 
-    node.globalTransform = Matrix4.translation(position) *
+    node.localTransform = Matrix4.translation(position) *
         Matrix4.rotationY(rotation) *
         math.min(1.0, 3 - 3 * collectAnimation) *
         scale;

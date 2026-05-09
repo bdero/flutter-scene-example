@@ -19,9 +19,9 @@
    git clone https://github.com/bdero/flutter-scene-example.git
    cd flutter-scene-example
    ```
-4. Run the app on macOS, Windows, Linux, iOS, or Android with Impeller enabled.
+4. Run the app on macOS, Windows, Linux, iOS, or Android with Impeller and Flutter GPU enabled.
    ```bash
-   flutter run -d macos --enable-impeller
+   flutter run -d macos --enable-flutter-gpu --enable-impeller
    ```
 
 ## History

@@ -1,7 +1,5 @@
 import 'dart:math' as math;
 
-import 'package:flutter_scene/animation.dart';
-import 'package:flutter_scene/node.dart';
 import 'package:flutter_scene/scene.dart';
 import 'package:scene_demo/demo/math_utils.dart';
 import 'package:scene_demo/demo/resource_cache.dart';
@@ -17,17 +15,24 @@ enum JumpAnimationState {
 
 class KinematicPlayer {
   KinematicPlayer() {
-    node = ResourceCache.getModel('dash');
-    walkAnimation = node.createAnimationClip(node.findAnimationByName("Walk")!);
-    idleAnimation = node.createAnimationClip(node.findAnimationByName("Idle")!);
-    runAnimation = node.createAnimationClip(node.findAnimationByName("Run")!);
+    _model = ResourceCache.getModel('dash');
+    node.add(_model);
+    walkAnimation =
+        _model.createAnimationClip(_model.findAnimationByName("Walk")!);
+    idleAnimation =
+        _model.createAnimationClip(_model.findAnimationByName("Idle")!);
+    runAnimation = _model.createAnimationClip(_model.findAnimationByName("Run")!);
     jumpStartAnimation =
-        node.createAnimationClip(node.findAnimationByName("JumpStart")!);
+        _model.createAnimationClip(_model.findAnimationByName("JumpStart")!);
     jumpLandAnimation =
-        node.createAnimationClip(node.findAnimationByName("JumpLand")!);
+        _model.createAnimationClip(_model.findAnimationByName("JumpLand")!);
   }
 
-  late Node node;
+  /// Positioning wrapper added to the scene. The loaded Dash model lives as
+  /// a child so its model-root transform (the importer's coordinate-system
+  /// flip) isn't clobbered when this node's transform is updated each frame.
+  final Node node = Node();
+  late final Node _model;
   late AnimationClip walkAnimation;
   late AnimationClip idleAnimation;
   late AnimationClip runAnimation;
@@ -86,7 +91,7 @@ class KinematicPlayer {
 
     Matrix4 transform = Matrix4.translation(_position) *
         Matrix4.rotationY(
-            Vector3(0, 0, 1).angleToSigned(_direction, Vector3(0, 1, 0)));
+            Vector3(0, 0, -1).angleToSigned(_direction, Vector3(0, 1, 0)));
 
     double speed = _velocityXZ.length;
 
@@ -113,7 +118,7 @@ class KinematicPlayer {
     jumpLandAnimation.loop = false;
     jumpLandAnimation.weight = landingWeight;
 
-    node.globalTransform = transform;
+    node.localTransform = transform;
   }
 
   /// Returns true if the player took damage.

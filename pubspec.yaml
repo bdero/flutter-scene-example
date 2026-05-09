@@ -5,7 +5,8 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0-85.0.dev <4.0.0'
+  sdk: ^3.7.0
+  flutter: ">=3.29.0-1.0.pre.242"
 
 dependencies:
   flutter:
@@ -13,17 +14,13 @@ dependencies:
 
   cupertino_icons: ^1.0.2
   vector_math: ^2.1.4
-  #flutter_scene: ^0.5.0-0
-  flutter_scene:
-    path: ../flutter_scene
-  #flutter_scene_importer: ^0.2.0-0
-  flutter_scene_importer:
-    path: ../flutter_scene/importer
+  flutter_scene: ^0.11.0
+  flutter_scene_importer: ^0.11.0
   gamepads: ^0.1.1
   json_annotation: ^4.8.1
   flutter_animate: ^4.5.0
   flutter_soloud: ^1.2.5
-  native_assets_cli: ^0.8.0
+  hooks: ^1.0.0
 
 dev_dependencies:
   flutter_test:

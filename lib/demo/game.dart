@@ -7,8 +7,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_scene/camera.dart';
-import 'package:flutter_scene/node.dart';
 import 'package:flutter_scene/scene.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:scene_demo/demo/camera.dart';
